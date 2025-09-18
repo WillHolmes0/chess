@@ -61,7 +61,8 @@ public class PieceMoveCalculator {
         KNIGHTRIGHTUP,
         KNIGHTRIGHTDOWN,
         KNIGHTDOWNRIGHT,
-        KNIGHTDOWNLEFT
+        KNIGHTDOWNLEFT,
+        PAWNDOUBLEADVANCE
     }
 
     protected ChessPosition getNewSpace(ChessPosition pos, MovementDirection direction) {
@@ -97,6 +98,8 @@ public class PieceMoveCalculator {
             return new ChessPosition(pos.getRow() - 2, pos.getColumn() + 1);
         } else if (direction == MovementDirection.KNIGHTDOWNLEFT) {
             return new ChessPosition(pos.getRow() - 2, pos.getColumn() - 1);
+        } else if (direction == MovementDirection.PAWNDOUBLEADVANCE) {
+            return new ChessPosition(pos.getRow() + 2, pos.getColumn());
         } else {
             throw new IllegalArgumentException("Did not provide a valid direction");
         }
