@@ -50,6 +50,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
+        throw new RuntimeException("not implemented");
     }
 }
