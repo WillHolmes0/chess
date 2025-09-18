@@ -3,6 +3,7 @@ package chess.ChessMoveCalculator;
 import java.util.Collection;
 import chess.ChessPosition;
 import chess.ChessBoard;
+import chess.ChessMove;
 
 public class PawnMoveCalculator extends PieceMoveCalculator{
 
@@ -19,7 +20,7 @@ public class PawnMoveCalculator extends PieceMoveCalculator{
         }
     }
 
-    public Collection<ChessPosition> getMoves () {
+    public Collection<ChessMove> getMoves () {
         fillMoves();
         return getMoveList();
     }

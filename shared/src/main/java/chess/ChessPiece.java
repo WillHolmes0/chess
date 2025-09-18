@@ -1,5 +1,7 @@
 package chess;
 
+import chess.ChessMoveCalculator.*;
+
 import java.util.Collection;
 
 /**
@@ -52,6 +54,20 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("not implemented");
+        if (type == PieceType.PAWN) {
+            return new PawnMoveCalculator(myPosition, board).getMoves();
+        } else if (type == PieceType.KING) {
+            return new KingMoveCalculator(myPosition, board).getMoves();
+        } else if (type == PieceType.QUEEN) {
+            return new QueenMoveCalculator(myPosition, board).getMoves();
+        } else if (type == PieceType.ROOK) {
+            return new RookMoveCalculator(myPosition, board).getMoves();
+        } else if (type == PieceType.BISHOP) {
+            return new BishopMoveCalculator(myPosition, board).getMoves();
+        } else if (type == PieceType.KNIGHT) {
+            return new KnightMoveCalculator(myPosition, board).getMoves();
+        } else {
+            throw new RuntimeException("The Correct piece type is not found");
+        }
     }
 }

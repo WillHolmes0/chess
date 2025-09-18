@@ -3,10 +3,11 @@ package chess.ChessMoveCalculator;
 import java.util.Collection;
 import chess.ChessPosition;
 import chess.ChessBoard;
+import chess.ChessMove;
 
-public class HorseMoveCalculator extends PieceMoveCalculator{
+public class KnightMoveCalculator extends PieceMoveCalculator{
 
-    public HorseMoveCalculator (ChessPosition startingPos, ChessBoard board) {
+    public KnightMoveCalculator(ChessPosition startingPos, ChessBoard board) {
         super(startingPos, board);
     }
 
@@ -25,7 +26,7 @@ public class HorseMoveCalculator extends PieceMoveCalculator{
         }
     }
 
-    public Collection<ChessPosition> getMoves () {
+    public Collection<ChessMove> getMoves () {
         fillMoves();
         return getMoveList();
     }

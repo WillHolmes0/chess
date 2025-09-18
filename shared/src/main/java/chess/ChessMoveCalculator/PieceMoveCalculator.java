@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import chess.ChessPosition;
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 
 public class PieceMoveCalculator {
 
     ChessPosition startingPos;
     ChessBoard board;
-    Collection<ChessPosition> moves;
+    Collection<ChessMove> moves;
 
     public PieceMoveCalculator (ChessPosition startingPos, ChessBoard board) {
         this.startingPos = startingPos;
@@ -37,11 +38,10 @@ public class PieceMoveCalculator {
 
     protected boolean checkAndAddSpace(ChessPosition pos) {
         if (isOpenSpace(pos)) {
-            moves.add(pos);
+            moves.add(new ChessMove(startingPos, pos, null));
             return true;
         } else if (isOpposingPiece((pos))) {
-            moves.add(pos);
-        }
+            moves.add(new ChessMove(startingPos, pos, null));        }
         return false;
     }
 
@@ -105,7 +105,7 @@ public class PieceMoveCalculator {
         }
     }
 
-    protected Collection<ChessPosition> getMoveList() {
+    protected Collection<ChessMove> getMoveList() {
         return moves;
     }
 }
