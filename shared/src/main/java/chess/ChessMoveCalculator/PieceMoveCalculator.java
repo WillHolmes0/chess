@@ -2,10 +2,8 @@ package chess.ChessMoveCalculator;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import chess.ChessPosition;
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
+
+import chess.*;
 
 public class PieceMoveCalculator {
 
@@ -20,7 +18,7 @@ public class PieceMoveCalculator {
     }
 
     protected boolean isInBounds(ChessPosition pos) {
-        return (pos.getRow() <= 8 && pos.getRow() > 0 && pos.getColumn() <= 8 && pos.getColumn() > 0);
+        return (pos.getRow() < 8 && pos.getRow() >= 0 && pos.getColumn() < 8 && pos.getColumn() >= 0);
     }
 
     protected boolean isSpaceEmpty(ChessPosition pos) {
@@ -28,7 +26,7 @@ public class PieceMoveCalculator {
     }
 
     protected boolean isOpposingPiece(ChessPosition pos) {
-        return (board.getPiece(pos).getTeamColor() == ChessGame.TeamColor.BLACK);
+        return board.getPiece(startingPos).getTeamColor() != board.getPiece(pos).getTeamColor();
     }
 
     protected boolean isOpenSpace(ChessPosition pos) {
@@ -40,7 +38,7 @@ public class PieceMoveCalculator {
         if (isOpenSpace(pos)) {
             moves.add(new ChessMove(startingPos, pos, null));
             return true;
-        } else if (isOpposingPiece((pos))) {
+        } else if (isInBounds(pos) && isOpposingPiece(pos)) {
             moves.add(new ChessMove(startingPos, pos, null));        }
         return false;
     }
