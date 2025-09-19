@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Objects;
+import chess.ChessGame.TeamColor;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
