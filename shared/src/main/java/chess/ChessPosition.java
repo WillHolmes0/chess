@@ -33,6 +33,14 @@ public class ChessPosition {
         return col - 1;
     }
 
+    public int getNonIndexedColumn() {
+        return col;
+    }
+
+    public int getNonIndexedRow() {
+        return row;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

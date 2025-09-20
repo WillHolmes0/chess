@@ -67,6 +67,11 @@ public class ChessGame {
         if (possibleMoves.contains(move.getEndPosition())) {
             board.addPiece(move.getStartPosition(), null);
             board.addPiece(move.getEndPosition(), piece);
+            if (move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8) {
+                if (piece.getPieceType() == PieceType.PAWN) {
+                    board.addPiece(pi)
+                }
+            }
         } else {
             throw new InvalidMoveException();
         }

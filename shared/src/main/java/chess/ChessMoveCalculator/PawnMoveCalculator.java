@@ -1,22 +1,62 @@
 package chess.ChessMoveCalculator;
 
 import java.util.Collection;
-import chess.ChessPosition;
-import chess.ChessBoard;
-import chess.ChessMove;
+
+import chess.*;
 
 public class PawnMoveCalculator extends PieceMoveCalculator{
 
-    public PawnMoveCalculator (ChessPosition startingPos, ChessBoard board) {
+    private ChessPiece piece;
+
+    public PawnMoveCalculator (ChessPosition startingPos, ChessBoard board, ChessPiece piece) {
         super(startingPos, board);
+        this.piece = piece;
     }
 
     public void fillMoves() {
-        checkAndAddSpace(getNewSpace(startingPos, MovementDirection.UPLEFT));
-        checkAndAddSpace(getNewSpace(startingPos, MovementDirection.UPRIGHT));
-        checkAndAddSpace(getNewSpace(startingPos, MovementDirection.UP));
-        if (startingPos.getRow() == 2) {
-            checkAndAddSpace(getNewSpace(startingPos, MovementDirection.PAWNDOUBLEADVANCE));
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            ChessPosition upLeft = getNewSpace(startingPos, MovementDirection.UPLEFT);
+            if (isInBounds(upLeft) && board.getPiece(upLeft) != null) {
+                if (board.getPiece(upLeft).getTeamColor() != ChessGame.TeamColor.WHITE) {
+                    addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.UPLEFT), null));
+                }
+            }
+            ChessPosition upRight = getNewSpace(startingPos, MovementDirection.UPRIGHT);
+            if (isInBounds(upRight) && board.getPiece(upRight) != null) {
+                if (board.getPiece(upRight).getTeamColor() != ChessGame.TeamColor.WHITE) {
+                    addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.UPRIGHT), null));
+                }
+            }
+            if (isInBounds(getNewSpace(startingPos, MovementDirection.UP)) && isOpenSpace(getNewSpace(startingPos, MovementDirection.UP))) {
+                moves.add(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.UP), null));
+                if (startingPos.getRow() == 1) {
+                    if (isOpenSpace(getNewSpace(startingPos, MovementDirection.PAWNDOUBLEUP))) {
+                        moves.add(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.PAWNDOUBLEUP), null));
+                    }
+                }
+            }
+        } else {
+            ChessPosition downLeft = getNewSpace(startingPos, MovementDirection.DOWNLEFT);
+            if (isInBounds(downLeft) && board.getPiece(downLeft) != null) {
+                if (board.getPiece(downLeft).getTeamColor() != ChessGame.TeamColor.BLACK) {
+                    addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.DOWNLEFT), null));
+                }
+            }
+            ChessPosition downRight = getNewSpace(startingPos, MovementDirection.DOWNRIGHT);
+            if (isInBounds(downRight) && board.getPiece(downRight) != null) {
+                if (board.getPiece(downRight).getTeamColor() != ChessGame.TeamColor.BLACK) {
+                    addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.DOWNRIGHT), null));
+                }
+            }
+            if (isInBounds(getNewSpace(startingPos, MovementDirection.DOWN)) && isOpenSpace(getNewSpace(startingPos, MovementDirection.DOWN))) {
+                addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.DOWN), null));
+                if (startingPos.getRow() == 6) {
+                    if (isOpenSpace(getNewSpace(startingPos, MovementDirection.PAWNDOUBLEDOWN))) {
+                        addMove(new ChessMove(startingPos, getNewSpace(startingPos, MovementDirection.PAWNDOUBLEDOWN), null));
+                    }
+                }
+            }
+
         }
     }
 

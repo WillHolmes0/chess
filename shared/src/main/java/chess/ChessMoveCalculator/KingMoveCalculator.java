@@ -14,6 +14,7 @@ public class KingMoveCalculator extends PieceMoveCalculator{
     public void fillMoves() {
         MovementDirection []singleMovements = {MovementDirection.LEFT, MovementDirection.UPLEFT, MovementDirection.UP, MovementDirection.UPRIGHT, MovementDirection.RIGHT, MovementDirection.DOWNRIGHT, MovementDirection.DOWN, MovementDirection.DOWNLEFT};
         for (int i = 0; i < 8; i++) {
+            System.out.println(i);
             checkAndAddSpace(getNewSpace(startingPos, singleMovements[i]));
         }
     }

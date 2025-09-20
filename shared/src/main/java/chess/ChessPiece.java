@@ -56,7 +56,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (type == PieceType.PAWN) {
-            return new PawnMoveCalculator(myPosition, board).getMoves();
+            return new PawnMoveCalculator(myPosition, board, this).getMoves();
         } else if (type == PieceType.KING) {
             return new KingMoveCalculator(myPosition, board).getMoves();
         } else if (type == PieceType.QUEEN) {
