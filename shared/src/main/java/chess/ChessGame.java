@@ -69,7 +69,8 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), piece);
             if (move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8) {
                 if (piece.getPieceType() == PieceType.PAWN) {
-                    board.addPiece(pi)
+                    ChessPiece newPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+                    board.addPiece(move.getEndPosition(), newPiece);
                 }
             }
         } else {
