@@ -9,6 +9,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPosition {
+
     private int row;
     private int col;
 
@@ -16,7 +17,7 @@ public class ChessPosition {
         this.row = row;
         this.col = col;
     }
-    // MAY HAVE TO ADD -1 TO GETROW AND GETCOLUMN
+
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
@@ -31,14 +32,6 @@ public class ChessPosition {
      */
     public int getColumn() {
         return col - 1;
-    }
-
-    public int getNonIndexedColumn() {
-        return col;
-    }
-
-    public int getNonIndexedRow() {
-        return row;
     }
 
     @Override

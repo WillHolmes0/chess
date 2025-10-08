@@ -1,6 +1,6 @@
 package chess;
 
-import chess.ChessMoveCalculator.*;
+import chess.MovementCalculator.*;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -13,11 +13,11 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor color;
+    private ChessGame.TeamColor pieceColor;
     private ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.color = pieceColor;
+        this.pieceColor = pieceColor;
         this.type = type;
     }
 
@@ -37,7 +37,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return color;
+        return pieceColor;
     }
 
     /**
@@ -55,21 +55,33 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (type == PieceType.PAWN) {
-            return new PawnMoveCalculator(myPosition, board, this).getMoves();
-        } else if (type == PieceType.KING) {
-            return new KingMoveCalculator(myPosition, board).getMoves();
-        } else if (type == PieceType.QUEEN) {
-            return new QueenMoveCalculator(myPosition, board).getMoves();
-        } else if (type == PieceType.ROOK) {
-            return new RookMoveCalculator(myPosition, board).getMoves();
-        } else if (type == PieceType.BISHOP) {
-            return new BishopMoveCalculator(myPosition, board).getMoves();
-        } else if (type == PieceType.KNIGHT) {
-            return new KnightMoveCalculator(myPosition, board).getMoves();
-        } else {
-            throw new RuntimeException("The Correct piece type is not found");
+        ChessPiece myPiece = board.getPiece(myPosition);
+        if (myPiece.type == PieceType.QUEEN) {
+            QueenMovement movements = new QueenMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
+        } else if (myPiece.type == PieceType.ROOK) {
+            RookMovement movements = new RookMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
+        } else if (myPiece.type == PieceType.BISHOP) {
+            BishopMovement movements = new BishopMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
+        } else if (myPiece.type == PieceType.KING) {
+            KingMovement movements = new KingMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
+        } else if (myPiece.type == PieceType.KNIGHT) {
+            KnightMovement movements = new KnightMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
+        } else if (myPiece.type == PieceType.PAWN) {
+            PawnMovement movements = new PawnMovement(board, myPiece, myPosition);
+            movements.findMoves();
+            return movements.getMoves();
         }
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -78,11 +90,11 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return color == that.color && type == that.type;
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, type);
+        return Objects.hash(pieceColor, type);
     }
 }
