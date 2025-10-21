@@ -3,9 +3,9 @@ import model.UserData;
 import java.util.UUID;
 
 public class Gateway {
-    private MemoryDatabse memoryDatabase;
+    private MemoryDatabase memoryDatabase;
 
-    public Gateway(MemoryDatabse memoryDatabase) {
+    public Gateway(MemoryDatabase memoryDatabase) {
         this.memoryDatabase = memoryDatabase;
     }
 
@@ -22,7 +22,7 @@ public class Gateway {
         return UUID.randomUUID().toString();
     }
 
-    public void addAuthToken() {
-
+    public void addAuthToken(String authToken) {
+        memoryDatabase.authTokens().add(authToken);
     }
 }
