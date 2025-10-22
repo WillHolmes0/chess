@@ -22,7 +22,8 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", (Context ctx) -> new RegisterHandler(memoryDatabase).handle(ctx))
-            .delete("/db", (Context ctx) -> new ClearApplicationHandler(memoryDatabase).handle(ctx));
+            .delete("/db", (Context ctx) -> new ClearApplicationHandler(memoryDatabase).handle(ctx))
+            .post("/session", (Context ctx) -> new LoginHandler(memoryDatabase).handle(ctx));
     }
 
     public int run(int desiredPort) {
