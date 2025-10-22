@@ -3,20 +3,21 @@ package dataaccess;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import model.AuthData;
 import model.UserData;
 
 public class MemoryDatabase {
     private HashMap<String, UserData> users;
-    private ArrayList<String> authTokens;
+    private HashMap<String, AuthData> authTokens;
 
     public MemoryDatabase() {
         users = new HashMap<>();
-        authTokens = new ArrayList<>();
+        authTokens = new HashMap<>();
     }
 
     public HashMap<String, UserData> Users() {
         return users;
     }
 
-    public ArrayList<String> authTokens() { return authTokens;}
+    public HashMap<String, AuthData> authTokens() { return authTokens;}
 }

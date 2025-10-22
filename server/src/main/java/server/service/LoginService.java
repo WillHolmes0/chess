@@ -2,6 +2,7 @@ package server.service;
 
 import dataaccess.AuthDAO;
 import dataaccess.MemoryDatabase;
+import model.AuthData;
 import model.UserData;
 import model.requests.LoginRequest;
 import model.responses.LoginResponse;
@@ -23,7 +24,8 @@ public class LoginService {
             if (userData.username().equals(loginRequest.username())  && userData.password().equals(loginRequest.password())) {
                 AuthDAO authDAO = new AuthDAO(memoryDatabase);
                 String authToken = authDAO.generateAuthToken();
-                authDAO.addAuthToken(authToken);
+                AuthData authData = new AuthData(authToken, userData.username());
+                authDAO.addAuthToken(authData);
                 return new LoginResponse(loginRequest.username(), authToken);
             } else {
                 System.out.println("invalid");

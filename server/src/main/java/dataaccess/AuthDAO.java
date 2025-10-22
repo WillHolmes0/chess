@@ -1,5 +1,7 @@
 package dataaccess;
 
+import model.AuthData;
+
 import java.util.UUID;
 
 public class AuthDAO {
@@ -13,8 +15,12 @@ public class AuthDAO {
         return UUID.randomUUID().toString();
     }
 
-    public void addAuthToken(String authToken) {
-        memoryDatabase.authTokens().add(authToken);
+    public void addAuthToken(AuthData authData) {
+        memoryDatabase.authTokens().put(authData.authToken(), authData);
+    }
+
+    public void deleteAuthToken(String authToken) {
+        memoryDatabase.authTokens().remove(authToken);
     }
 
     public void clearDatabase() {

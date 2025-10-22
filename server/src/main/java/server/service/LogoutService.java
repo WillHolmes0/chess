@@ -1,0 +1,17 @@
+package server.service;
+
+import dataaccess.AuthDAO;
+import dataaccess.MemoryDatabase;
+import model.requests.LogoutRequest;
+
+public class LogoutService {
+    private MemoryDatabase memoryDatabase;
+
+    public LogoutService(MemoryDatabase memoryDatabase) {
+        this.memoryDatabase = memoryDatabase;
+    }
+
+    public void logoutUser(LogoutRequest logoutRequest) {
+        AuthDAO authDAO = new AuthDAO(memoryDatabase);
+    }
+}

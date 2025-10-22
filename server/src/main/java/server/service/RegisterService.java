@@ -3,6 +3,7 @@ import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import dataaccess.MemoryDatabase;
 import exception.AlreadyTakenException;
+import model.AuthData;
 import model.UserData;
 import model.requests.RegisterRequest;
 import model.responses.RegisterResponse;
@@ -25,7 +26,8 @@ public class RegisterService {
             //Generate and Add authToken
             AuthDAO authDAO = new AuthDAO(memoryDatabase);
             String authToken = authDAO.generateAuthToken();
-            authDAO.addAuthToken(authToken);
+            AuthData authData = new AuthData(authToken, userData.username());
+            authDAO.addAuthToken(authData);
             return new RegisterResponse(authToken, retrievedUser);
         } else {
             throw new AlreadyTakenException("Error: username is already taken");
