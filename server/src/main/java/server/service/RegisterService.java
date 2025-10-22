@@ -16,11 +16,12 @@ public class RegisterService {
 
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException {
         UserDAO userDAO = new UserDAO(memoryDatabase);
-        UserData user = userDAO.getUser(registerRequest.userData().username());
+        UserData user = userDAO.getUser(registerRequest.username());
         if (user == null) {
             //Add the user to the User Database, then retrieve the username again for the request response which ensures retrieving the user works.
-            userDAO.addUser(registerRequest.userData());
-            String retrievedUser = userDAO.getUser(registerRequest.userData().username()).username();
+            UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+            userDAO.addUser(userData);
+            String retrievedUser = userDAO.getUser(registerRequest.username()).username();
             //Generate and Add authToken
             AuthDAO authDAO = new AuthDAO(memoryDatabase);
             String authToken = authDAO.generateAuthToken();

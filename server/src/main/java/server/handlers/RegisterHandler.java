@@ -20,10 +20,9 @@ public class RegisterHandler {
     }
 
     public void handle(Context ctx) {
-        UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
         try {
-            RegisterRequest registerRequest = new RegisterRequest(userData);
-            if (registerRequest.userData().username() == null || registerRequest.userData().email() == null || registerRequest.userData().password() == null) {
+            RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
+            if (registerRequest.username() == null || registerRequest.email() == null || registerRequest.password() == null) {
                 throw new BadRequestException("Error: bad request");
             }
             RegisterResponse registerResponse = registerService.registerUser(registerRequest);
