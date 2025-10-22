@@ -24,7 +24,6 @@ public class CreateGameHandler {
         try {
             CreateGameResponse createGameResponse = createGameService.createGame(createGameRequest);
             ctx.status(200);
-            System.out.println(createGameResponse);
             ctx.result(new Gson().toJson(createGameResponse));
         } catch (BadRequestException e) {
             ctx.status(e.getCode());
