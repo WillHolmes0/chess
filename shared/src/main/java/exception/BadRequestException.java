@@ -1,8 +1,7 @@
 package exception;
 
 public class BadRequestException extends RuntimeException {
-    private int code = 403;
-    private String message;
+    private int code = 400;
 
     public BadRequestException(String message) {
         super(message);
@@ -13,6 +12,6 @@ public class BadRequestException extends RuntimeException {
     }
 
     public MessageWrapper messageWrapper() {
-        return new MessageWrapper(message);
+        return new MessageWrapper(getMessage());
     }
 }
