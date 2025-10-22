@@ -22,7 +22,7 @@ public class AuthDAO {
         memoryDatabase.authTokens().remove(authToken);
     }
 
-    public AuthData getAuthToken(String authToken) {
+    public AuthData getAuthData(String authToken) {
         return memoryDatabase.authTokens().get(authToken);
     }
 

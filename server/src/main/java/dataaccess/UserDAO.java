@@ -10,16 +10,16 @@ public class UserDAO {
     }
 
     public void addUser(UserData userData) {
-        memoryDatabase.Users().put(userData.username(), userData);
-        System.out.println(memoryDatabase.Users());
+        memoryDatabase.users().put(userData.username(), userData);
+        System.out.println(memoryDatabase.users());
     }
 
     public UserData getUser(String username) {
-        return memoryDatabase.Users().get(username);
+        return memoryDatabase.users().get(username);
     }
 
     public void clearDatabase() {
-        memoryDatabase.Users().clear();
+        memoryDatabase.users().clear();
     }
 
 }
