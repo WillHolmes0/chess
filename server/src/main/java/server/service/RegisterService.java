@@ -1,26 +1,33 @@
 package server.service;
-import dataaccess.Gateway;
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
 import dataaccess.MemoryDatabase;
-import exception.alreadyTakenException;
+import exception.AlreadyTakenException;
+import model.UserData;
 import model.requests.RegisterRequest;
 import model.responses.RegisterResponse;
 
 public class RegisterService {
-    private Gateway gateway;
+    private MemoryDatabase memoryDatabase;
 
     public RegisterService(MemoryDatabase memoryDatabase) {
-        this.gateway = new Gateway(memoryDatabase);
+        this.memoryDatabase = memoryDatabase;
     }
 
-    public RegisterResponse registerUser(RegisterRequest registerRequest) {
-        String user = gateway.getUser(registerRequest.userData().username()).username();
+    public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException {
+        UserDAO userDAO = new UserDAO(memoryDatabase);
+        UserData user = userDAO.getUser(registerRequest.userData().username());
         if (user == null) {
-            gateway.addUser(registerRequest.userData());
-            String authToken = gateway.generateAuthToken();
-            gateway.addAuthToken(authToken);
-            return new RegisterResponse(authToken);
+            //Add the user to the User Database, then retrieve the username again for the request response which ensures retrieving the user works.
+            userDAO.addUser(registerRequest.userData());
+            String retrievedUser = userDAO.getUser(registerRequest.userData().username()).username();
+            //Generate and Add authToken
+            AuthDAO authDAO = new AuthDAO(memoryDatabase);
+            String authToken = authDAO.generateAuthToken();
+            authDAO.addAuthToken(authToken);
+            return new RegisterResponse(authToken, retrievedUser);
         } else {
-            throw new alreadyTakenException("username is already taken");
+            throw new AlreadyTakenException("Error: username is already taken");
         }
     }
 }

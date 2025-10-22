@@ -1,3 +1,3 @@
 package model.responses;
 
-public record RegisterResponse(String authToken) {}
+public record RegisterResponse(String authToken, String username) {}

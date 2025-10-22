@@ -2,10 +2,10 @@ package dataaccess;
 import model.UserData;
 import java.util.UUID;
 
-public class Gateway {
+public class UserDAO {
     private MemoryDatabase memoryDatabase;
 
-    public Gateway(MemoryDatabase memoryDatabase) {
+    public UserDAO(MemoryDatabase memoryDatabase) {
         this.memoryDatabase = memoryDatabase;
     }
 
@@ -18,11 +18,8 @@ public class Gateway {
         return memoryDatabase.Users().get(username);
     }
 
-    public String generateAuthToken() {
-        return UUID.randomUUID().toString();
+    public void clearDatabase() {
+        memoryDatabase.Users().clear();
     }
 
-    public void addAuthToken(String authToken) {
-        memoryDatabase.authTokens().add(authToken);
-    }
 }
