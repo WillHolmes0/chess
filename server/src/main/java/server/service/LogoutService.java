@@ -13,5 +13,6 @@ public class LogoutService {
 
     public void logoutUser(LogoutRequest logoutRequest) {
         AuthDAO authDAO = new AuthDAO(memoryDatabase);
+        authDAO.deleteAuthToken(logoutRequest.authorization());
     }
 }
