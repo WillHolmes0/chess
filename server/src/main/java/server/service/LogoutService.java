@@ -2,6 +2,8 @@ package server.service;
 
 import dataaccess.AuthDAO;
 import dataaccess.MemoryDatabase;
+import exception.UnauthorizedException;
+import model.AuthData;
 import model.requests.LogoutRequest;
 
 public class LogoutService {
@@ -13,6 +15,11 @@ public class LogoutService {
 
     public void logoutUser(LogoutRequest logoutRequest) {
         AuthDAO authDAO = new AuthDAO(memoryDatabase);
-        authDAO.deleteAuthToken(logoutRequest.authorization());
+        AuthData authData = authDAO.getAuthToken(logoutRequest.authorization());
+        if (authData != null) {
+            authDAO.deleteAuthToken(logoutRequest.authorization());
+        } else {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 }

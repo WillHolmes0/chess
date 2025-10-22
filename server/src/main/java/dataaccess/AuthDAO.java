@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-
 import java.util.UUID;
 
 public class AuthDAO {
@@ -21,6 +20,10 @@ public class AuthDAO {
 
     public void deleteAuthToken(String authToken) {
         memoryDatabase.authTokens().remove(authToken);
+    }
+
+    public AuthData getAuthToken(String authToken) {
+        return memoryDatabase.authTokens().get(authToken);
     }
 
     public void clearDatabase() {

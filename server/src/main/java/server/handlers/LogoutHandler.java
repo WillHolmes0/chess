@@ -2,9 +2,11 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryDatabase;
+import exception.UnauthorizedException;
 import model.requests.LogoutRequest;
 import server.service.LogoutService;
 import io.javalin.http.Context;
+import exception.MessageWrapper;
 
 
 public class LogoutHandler {
@@ -18,8 +20,13 @@ public class LogoutHandler {
 
     public void handle(Context ctx) {
         LogoutRequest logoutRequest = new LogoutRequest(ctx.header("authorization"));
-        logoutService.logoutUser(logoutRequest);
-        ctx.status(200);
-        ctx.result();
+        try {
+            logoutService.logoutUser(logoutRequest);
+            ctx.status(200);
+            ctx.result();
+        } catch (UnauthorizedException e) {
+            ctx.status(e.getCode());
+            ctx.result(new Gson().toJson(e.messageWrapper()));
+        }
     }
 }
