@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import server.exception.AlreadyTakenException;
 import server.exception.BadRequestException;
+import server.exception.MessageWrapper;
 import server.exception.UnauthorizedException;
 import io.javalin.http.Context;
 import server.requests.JoinGameRequest;
@@ -37,7 +38,8 @@ public class JoinGameHandler {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
         } catch (DataAccessException e) {
-
+            ctx.status(500);
+            ctx.result(new Gson().toJson(new MessageWrapper(e.getMessage())));
         }
     }
 }

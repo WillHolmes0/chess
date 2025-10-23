@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import server.exception.BadRequestException;
+import server.exception.MessageWrapper;
 import server.exception.UnauthorizedException;
 import server.requests.CreateGameRequest;
 import server.responses.CreateGameResponse;
@@ -33,7 +34,8 @@ public class CreateGameHandler {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
         } catch (DataAccessException e) {
-
+            ctx.status(500);
+            ctx.result(new Gson().toJson(new MessageWrapper(e.getMessage())));
         }
     }
 

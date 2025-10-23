@@ -6,6 +6,7 @@ import dataaccess.MemoryDatabase;
 import server.exception.AlreadyTakenException;
 import server.exception.BadRequestException;
 import io.javalin.http.Context;
+import server.exception.MessageWrapper;
 import server.requests.RegisterRequest;
 import server.responses.RegisterResponse;
 import service.RegisterService;
@@ -33,6 +34,8 @@ public class RegisterHandler {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
         } catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.result(new Gson().toJson(new MessageWrapper(e.getMessage())));
         }
     }
 }
