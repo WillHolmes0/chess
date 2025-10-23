@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
@@ -19,7 +20,7 @@ public class JoinGameService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) {
+    public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
         if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }

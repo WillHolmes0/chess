@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryDatabase;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 
 public class ClearApplicationService {
     private MemoryDatabase memoryDatabase;
@@ -12,7 +9,7 @@ public class ClearApplicationService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public void clearAll() {
+    public void clearAll() throws DataAccessException {
         MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);

@@ -6,11 +6,11 @@ public interface AuthDAO {
 
     public String generateAuthToken();
 
-    public void addAuthToken(AuthData authData);
+    public void addAuthToken(AuthData authData) throws DataAccessException;
 
-    public void deleteAuthToken(String authToken);
+    public void deleteAuthToken(String authToken) throws DataAccessException;
 
-    public AuthData getAuthData(String authToken);
+    public AuthData getAuthData(String authToken) throws DataAccessException;
 
-    public void clearDatabase();
+    public void clearDatabase() throws DataAccessException;
 }

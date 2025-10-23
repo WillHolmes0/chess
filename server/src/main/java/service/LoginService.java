@@ -1,8 +1,10 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
 import dataaccess.MemoryUserDAO;
+import server.exception.AlreadyTakenException;
 import server.exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
@@ -17,7 +19,7 @@ public class LoginService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public LoginResponse loginUser(LoginRequest loginRequest) {
+    public LoginResponse loginUser(LoginRequest loginRequest) throws DataAccessException, AlreadyTakenException, BadRequestException, UnauthorizedException {
         if (loginRequest.username() == null || loginRequest.password() == null) {
             throw new BadRequestException("Error: missing field");
         }

@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
@@ -20,7 +21,7 @@ public class CreateGameService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public CreateGameResponse createGame(CreateGameRequest createGameRequest) {
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException {
         if (createGameRequest.gameName() == null || createGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }

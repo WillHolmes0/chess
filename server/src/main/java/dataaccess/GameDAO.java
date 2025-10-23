@@ -5,11 +5,11 @@ import model.GameData;
 
 public interface GameDAO {
 
-    void createGame(GameData gameData);
+    void createGame(GameData gameData) throws DataAccessException;
 
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws DataAccessException;
 
-    void setPlayer(String username, ChessGame.TeamColor playerColor, int gameID);
+    void setPlayer(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
 
-    void clearDatabase();
+    void clearDatabase() throws DataAccessException;
 }

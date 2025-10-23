@@ -1,4 +1,5 @@
 package service;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryDatabase;
@@ -16,7 +17,7 @@ public class RegisterService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException {
+    public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException, DataAccessException, BadRequestException {
         if (registerRequest.username() == null || registerRequest.email() == null || registerRequest.password() == null) {
             throw new BadRequestException("Error: missing field");
         }

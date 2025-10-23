@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
 import server.exception.UnauthorizedException;
@@ -14,7 +15,7 @@ public class LogoutService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public LogoutResponse logoutUser(LogoutRequest logoutRequest) {
+    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedException, DataAccessException {
         MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(logoutRequest.authorization());
         if (authData != null) {
