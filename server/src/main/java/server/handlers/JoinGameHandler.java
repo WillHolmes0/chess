@@ -1,0 +1,39 @@
+package server.handlers;
+
+import com.google.gson.Gson;
+import dataaccess.MemoryDatabase;
+import exception.AlreadyTakenException;
+import exception.BadRequestException;
+import exception.UnauthorizedException;
+import io.javalin.http.Context;
+import model.requests.JoinGameRequest;
+import server.service.JoinGameService;
+
+public class JoinGameHandler {
+    private MemoryDatabase memoryDatabase;
+    private JoinGameService joinGameService;
+
+    public JoinGameHandler(MemoryDatabase memoryDatabase) {
+        this.memoryDatabase = memoryDatabase;
+        this.joinGameService = new JoinGameService(memoryDatabase);
+    }
+
+    public void handle(Context ctx) {
+        JoinGameRequest joinGameRequestBody = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
+        JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameRequestBody.playerColor(), joinGameRequestBody.gameID(), ctx.header("authorization"));
+        try {
+            joinGameService.joinGame(joinGameRequest);
+            ctx.status(200);
+            ctx.result();
+        } catch (UnauthorizedException e) {
+            ctx.status(e.getCode());
+            ctx.result(new Gson().toJson(e.messageWrapper()));
+        } catch (AlreadyTakenException e) {
+            ctx.status(e.getCode());
+            ctx.result(new Gson().toJson(e.messageWrapper()));
+        } catch (BadRequestException e) {
+            ctx.status(e.getCode());
+            ctx.result(new Gson().toJson(e.messageWrapper()));
+        }
+    }
+}

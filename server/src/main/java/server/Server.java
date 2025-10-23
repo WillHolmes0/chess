@@ -26,7 +26,8 @@ public class Server {
             .post("/session", (Context ctx) -> new LoginHandler(memoryDatabase).handle(ctx))
             .delete("/session", (Context ctx) -> new LogoutHandler(memoryDatabase).handle(ctx))
             .post("/game", (Context ctx) -> new CreateGameHandler(memoryDatabase).handle(ctx))
-            .get("/game", (Context ctx) -> new ListGamesHandler(memoryDatabase).handle(ctx));
+            .get("/game", (Context ctx) -> new ListGamesHandler(memoryDatabase).handle(ctx))
+            .put("/game", (Context ctx) -> new JoinGameHandler(memoryDatabase).handle(ctx));
     }
 
     public int run(int desiredPort) {
