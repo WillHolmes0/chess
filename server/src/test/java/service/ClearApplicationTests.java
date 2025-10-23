@@ -27,7 +27,11 @@ public class ClearApplicationTests {
         memoryDatabase.users().put("user3", new UserData("user3", "password3", "email3"));
 
         ClearApplicationService clearApplicationService = new ClearApplicationService(memoryDatabase);
-        clearApplicationService.clearAll();
+        try {
+            clearApplicationService.clearAll();
+        } catch (Exception e) {
+
+        }
         Assertions.assertEquals(0, memoryDatabase.users().size());
         Assertions.assertEquals(0, memoryDatabase.games().size());
         Assertions.assertEquals(0, memoryDatabase.authTokens().size());

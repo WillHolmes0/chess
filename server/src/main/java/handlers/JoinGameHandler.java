@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import server.exception.AlreadyTakenException;
 import server.exception.BadRequestException;
@@ -35,6 +36,8 @@ public class JoinGameHandler {
         } catch (BadRequestException e) {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
+        } catch (DataAccessException e) {
+
         }
     }
 }

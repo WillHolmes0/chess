@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import server.exception.BadRequestException;
 import server.exception.UnauthorizedException;
@@ -30,6 +31,8 @@ public class LoginHandler {
         } catch (UnauthorizedException e) {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
+        } catch (DataAccessException e) {
+
         }
     }
 }

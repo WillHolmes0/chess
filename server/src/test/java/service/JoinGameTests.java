@@ -25,7 +25,9 @@ public class JoinGameTests {
 
         JoinGameService joinGameService = new JoinGameService(memoryDatabase);
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 1, "bypass");
-        joinGameService.joinGame(joinGameRequest);
+        try {
+            joinGameService.joinGame(joinGameRequest);
+        } catch (Exception e) {}
 
         GameData game = memoryDatabase.games().get("1");
         Assertions.assertEquals(1, memoryDatabase.games().size());

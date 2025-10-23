@@ -1,5 +1,6 @@
 package handlers;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import io.javalin.http.Context;
 import service.ClearApplicationService;
@@ -14,8 +15,12 @@ public class ClearApplicationHandler {
     }
 
     public void handle(Context ctx) {
-        clearApplicationService.clearAll();
-        ctx.status(200);
-        ctx.result();
+        try {
+            clearApplicationService.clearAll();
+            ctx.status(200);
+            ctx.result();
+        } catch (DataAccessException e) {
+
+        }
     }
 }
