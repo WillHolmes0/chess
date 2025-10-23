@@ -346,6 +346,9 @@ public class StandardAPITests {
         TestListResult listResult = serverFacade.listGames(existingAuth);
         assertHttpOk(listResult);
         TestListEntry[] returnedList = listResult.getGames();
+        for (int i = 0; i < returnedList.length; i++) {
+            System.out.println(returnedList[i]);
+        }
         Assertions.assertNotNull(returnedList, "List result did not contain a list of games");
         Comparator<TestListEntry> gameIdComparator = Comparator.comparingInt(TestListEntry::getGameID);
         Arrays.sort(expectedList, gameIdComparator);

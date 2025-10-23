@@ -19,7 +19,7 @@ public class JoinGameService {
     }
 
     public void joinGame(JoinGameRequest joinGameRequest) {
-        if (joinGameRequest.playerColor() == null || joinGameRequest.authorization() == null) {
+        if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
             throw new BadRequestException("Error: bad request");
         }
         AuthDAO authDAO = new AuthDAO(memoryDatabase);
@@ -28,16 +28,20 @@ public class JoinGameService {
             String username = authData.username();
             GameDAO gameDAO = new GameDAO(memoryDatabase);
             ChessGame.TeamColor playerColor;
+            GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
+            if (prospectiveGameData == null) {
+                throw new BadRequestException("Error: bad request");
+            }
             if (joinGameRequest.playerColor().equals("WHITE")) {
+                System.out.println("white");
                 playerColor = ChessGame.TeamColor.WHITE;
-                GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
                 if (prospectiveGameData.whiteUsername() != null) {
                     throw new AlreadyTakenException("Error: already taken");
                 }
             } else if (joinGameRequest.playerColor().equals("BLACK")) {
+                System.out.println("black");
                 playerColor = ChessGame.TeamColor.BLACK;
-                GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
-                if (prospectiveGameData.whiteUsername() != null) {
+                if (prospectiveGameData.blackUsername() != null) {
                     throw new AlreadyTakenException("Error: already taken");
                 }
             } else {

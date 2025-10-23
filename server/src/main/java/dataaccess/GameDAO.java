@@ -13,7 +13,7 @@ public class GameDAO {
     }
 
     public void createGame(GameData gameData) {
-        memoryDatabase.games().put(String.valueOf(gameData.gameId()), gameData);
+        memoryDatabase.games().put(String.valueOf(gameData.gameID()), gameData);
     }
 
     public GameData getGame(int gameId) {
@@ -28,11 +28,11 @@ public class GameDAO {
         GameData newGame;
         GameData game = memoryDatabase.games().get(String.valueOf(gameId));
         if (playerColor == ChessGame.TeamColor.WHITE) {
-            newGame = new GameData(game.gameId(), username, game.blackUsername(), game.gameName(), game.game());
+            newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
-            newGame = new GameData(game.gameId(), game.whiteUsername(), username, game.gameName(), game.game());
+            newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
-        memoryDatabase.games().put(String.valueOf(newGame.gameId()), newGame);
+        memoryDatabase.games().put(String.valueOf(newGame.gameID()), newGame);
     }
 
     public void clearDatabase() {
