@@ -10,6 +10,7 @@ import exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import model.requests.JoinGameRequest;
+import model.responses.JoinGameResponse;
 
 public class JoinGameService {
     private MemoryDatabase memoryDatabase;
@@ -18,7 +19,7 @@ public class JoinGameService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public void joinGame(JoinGameRequest joinGameRequest) {
+    public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) {
         if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }
@@ -48,6 +49,7 @@ public class JoinGameService {
                 throw new BadRequestException("Error: invalid player color");
             }
             gameDAO.setPlayer(username, playerColor, joinGameRequest.gameID());
+            return new JoinGameResponse();
         } else {
             throw new UnauthorizedException("Error: unauthorized");
         }

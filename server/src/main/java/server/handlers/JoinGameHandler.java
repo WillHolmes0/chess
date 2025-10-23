@@ -7,6 +7,7 @@ import exception.BadRequestException;
 import exception.UnauthorizedException;
 import io.javalin.http.Context;
 import model.requests.JoinGameRequest;
+import model.responses.JoinGameResponse;
 import server.service.JoinGameService;
 
 public class JoinGameHandler {
@@ -22,9 +23,9 @@ public class JoinGameHandler {
         JoinGameRequest joinGameRequestBody = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
         JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameRequestBody.playerColor(), joinGameRequestBody.gameID(), ctx.header("authorization"));
         try {
-            joinGameService.joinGame(joinGameRequest);
+            JoinGameResponse joinGameResponse = joinGameService.joinGame(joinGameRequest);
             ctx.status(200);
-            ctx.result();
+            ctx.result(new Gson().toJson(joinGameResponse));
         } catch (UnauthorizedException e) {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
