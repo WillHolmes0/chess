@@ -1,10 +1,9 @@
 package server.service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
-import exception.AlreadyTakenException;
 import exception.BadRequestException;
 import exception.UnauthorizedException;
 import model.AuthData;
@@ -25,8 +24,8 @@ public class CreateGameService {
         if (createGameRequest.gameName() == null || createGameRequest.authorization() == null) {
             throw new BadRequestException("Error: bad request");
         }
-        AuthDAO authDAO = new AuthDAO(memoryDatabase);
-        GameDAO gameDAO = new GameDAO(memoryDatabase);
+        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+        MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(createGameRequest.authorization());
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
@@ -40,7 +39,7 @@ public class CreateGameService {
         Random randomGenerator = new Random();
         int gameId = randomGenerator.nextInt(1, 10000);
         System.out.println(gameId);
-        GameDAO gameDAO = new GameDAO(memoryDatabase);
+        MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         if (gameDAO.getGame(gameId) == null) {
             return gameId;
         }

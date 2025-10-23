@@ -1,8 +1,8 @@
 package server.service;
 
-import dataaccess.AuthDAO;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
-import dataaccess.UserDAO;
+import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import model.requests.LoginRequest;
@@ -20,11 +20,11 @@ public class LoginService {
         System.out.println(loginRequest.username());
         System.out.println(loginRequest.password());
 
-        UserDAO userDAO = new UserDAO(memoryDatabase);
+        MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData != null) {
             if (userData.username().equals(loginRequest.username())  && userData.password().equals(loginRequest.password())) {
-                AuthDAO authDAO = new AuthDAO(memoryDatabase);
+                MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
                 String authToken = authDAO.generateAuthToken();
                 AuthData authData = new AuthData(authToken, userData.username());
                 authDAO.addAuthToken(authData);

@@ -1,8 +1,8 @@
 package server.service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
 import exception.AlreadyTakenException;
 import exception.BadRequestException;
@@ -22,11 +22,11 @@ public class JoinGameService {
         if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
             throw new BadRequestException("Error: bad request");
         }
-        AuthDAO authDAO = new AuthDAO(memoryDatabase);
+        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(joinGameRequest.authorization());
         if (authData != null) {
             String username = authData.username();
-            GameDAO gameDAO = new GameDAO(memoryDatabase);
+            MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
             ChessGame.TeamColor playerColor;
             GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
             if (prospectiveGameData == null) {

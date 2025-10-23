@@ -1,10 +1,9 @@
 package server.service;
 
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
-import dataaccess.UserDAO;
-import model.GameData;
+import dataaccess.MemoryUserDAO;
 
 public class ClearApplicationService {
     private MemoryDatabase memoryDatabase;
@@ -14,9 +13,9 @@ public class ClearApplicationService {
     }
 
     public void clearAll() {
-        AuthDAO authDAO = new AuthDAO(memoryDatabase);
-        UserDAO userDAO = new UserDAO(memoryDatabase);
-        GameDAO gameDAO = new GameDAO(memoryDatabase);
+        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+        MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
+        MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         authDAO.clearDatabase();
         userDAO.clearDatabase();
         gameDAO.clearDatabase();

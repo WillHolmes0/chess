@@ -1,7 +1,7 @@
 package server.service;
 
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
 import exception.UnauthorizedException;
 import model.AuthData;
@@ -10,8 +10,6 @@ import model.requests.ListGamesRequest;
 import model.responses.ListGamesResponse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public class ListGamesService {
@@ -22,10 +20,10 @@ public class ListGamesService {
     }
 
     public ListGamesResponse listGames(ListGamesRequest listGamesRequest) {
-        AuthDAO authDAO = new AuthDAO(memoryDatabase);
+        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(listGamesRequest.authorization());
         if (authData != null) {
-            GameDAO gameDAO = new GameDAO(memoryDatabase);
+            MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
             Set<String> gameKeySet = gameDAO.getGameKeys();
             ArrayList<GameData> gameList = new ArrayList<>();
             for (String key : gameKeySet) {

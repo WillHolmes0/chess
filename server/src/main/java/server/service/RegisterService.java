@@ -1,6 +1,6 @@
 package server.service;
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryDatabase;
 import exception.AlreadyTakenException;
 import model.AuthData;
@@ -16,7 +16,7 @@ public class RegisterService {
     }
 
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException {
-        UserDAO userDAO = new UserDAO(memoryDatabase);
+        MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         UserData user = userDAO.getUser(registerRequest.username());
         if (user == null) {
             //Add the user to the User Database, then retrieve the username again for the request response which ensures retrieving the user works.
@@ -24,7 +24,7 @@ public class RegisterService {
             userDAO.addUser(userData);
             String retrievedUser = userDAO.getUser(registerRequest.username()).username();
             //Generate and Add authToken
-            AuthDAO authDAO = new AuthDAO(memoryDatabase);
+            MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
             String authToken = authDAO.generateAuthToken();
             AuthData authData = new AuthData(authToken, userData.username());
             authDAO.addAuthToken(authData);
