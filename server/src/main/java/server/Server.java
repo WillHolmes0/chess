@@ -1,15 +1,9 @@
 package server;
 
 import dataaccess.MemoryDatabase;
+import handlers.*;
 import io.javalin.*;
 import io.javalin.http.Context;
-import com.google.gson.Gson;
-import server.handlers.*;
-import server.service.*;
-import model.requests.RegisterRequest;
-import model.UserData;
-import model.responses.RegisterResponse;
-import exception.*;
 
 
 public class Server {
