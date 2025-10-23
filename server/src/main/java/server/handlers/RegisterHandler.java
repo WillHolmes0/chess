@@ -22,9 +22,6 @@ public class RegisterHandler {
     public void handle(Context ctx) {
         try {
             RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-            if (registerRequest.username() == null || registerRequest.email() == null || registerRequest.password() == null) {
-                throw new BadRequestException("Error: bad request");
-            }
             RegisterResponse registerResponse = registerService.registerUser(registerRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(registerResponse));

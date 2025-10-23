@@ -20,7 +20,7 @@ public class JoinGameService {
 
     public void joinGame(JoinGameRequest joinGameRequest) {
         if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: missing field");
         }
         MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(joinGameRequest.authorization());
@@ -30,22 +30,22 @@ public class JoinGameService {
             ChessGame.TeamColor playerColor;
             GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
             if (prospectiveGameData == null) {
-                throw new BadRequestException("Error: bad request");
+                throw new BadRequestException("Error: invalid gameID");
             }
             if (joinGameRequest.playerColor().equals("WHITE")) {
                 System.out.println("white");
                 playerColor = ChessGame.TeamColor.WHITE;
                 if (prospectiveGameData.whiteUsername() != null) {
-                    throw new AlreadyTakenException("Error: already taken");
+                    throw new AlreadyTakenException("Error: color already taken");
                 }
             } else if (joinGameRequest.playerColor().equals("BLACK")) {
                 System.out.println("black");
                 playerColor = ChessGame.TeamColor.BLACK;
                 if (prospectiveGameData.blackUsername() != null) {
-                    throw new AlreadyTakenException("Error: already taken");
+                    throw new AlreadyTakenException("Error: color already taken");
                 }
             } else {
-                throw new BadRequestException("Error: bad request");
+                throw new BadRequestException("Error: invalid player color");
             }
             gameDAO.setPlayer(username, playerColor, joinGameRequest.gameID());
         } else {

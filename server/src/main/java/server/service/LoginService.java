@@ -3,6 +3,7 @@ package server.service;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
 import dataaccess.MemoryUserDAO;
+import exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
 import model.requests.LoginRequest;
@@ -17,9 +18,9 @@ public class LoginService {
     }
 
     public LoginResponse loginUser(LoginRequest loginRequest) {
-        System.out.println(loginRequest.username());
-        System.out.println(loginRequest.password());
-
+        if (loginRequest.username() == null || loginRequest.password() == null) {
+            throw new BadRequestException("Error: missing field");
+        }
         MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData != null) {
@@ -30,11 +31,9 @@ public class LoginService {
                 authDAO.addAuthToken(authData);
                 return new LoginResponse(loginRequest.username(), authToken);
             } else {
-                System.out.println("invalid");
-                throw new UnauthorizedException("Error: unauthorized");
+                throw new UnauthorizedException("Error: invalid login credentials");
             }
         } else {
-            System.out.println("was null");
             throw new UnauthorizedException("Error: unauthorized");
         }
     }

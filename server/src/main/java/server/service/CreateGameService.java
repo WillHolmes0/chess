@@ -22,7 +22,7 @@ public class CreateGameService {
 
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) {
         if (createGameRequest.gameName() == null || createGameRequest.authorization() == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: missing field");
         }
         MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);

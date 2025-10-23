@@ -3,6 +3,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryDatabase;
 import exception.AlreadyTakenException;
+import exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
 import model.requests.RegisterRequest;
@@ -16,6 +17,9 @@ public class RegisterService {
     }
 
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws AlreadyTakenException {
+        if (registerRequest.username() == null || registerRequest.email() == null || registerRequest.password() == null) {
+            throw new BadRequestException("Error: missing field");
+        }
         MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         UserData user = userDAO.getUser(registerRequest.username());
         if (user == null) {

@@ -21,9 +21,6 @@ public class LoginHandler {
     public void handle(Context ctx) {
         try {
             LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
-            if (loginRequest.username() == null || loginRequest.password() == null) {
-                throw new BadRequestException("Error: bad request");
-            }
             LoginResponse loginResponse = loginService.loginUser(loginRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(loginResponse));
