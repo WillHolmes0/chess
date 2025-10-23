@@ -3,10 +3,10 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
-import server.exception.UnauthorizedException;
+import service.exception.UnauthorizedException;
 import model.AuthData;
-import server.requests.LogoutRequest;
-import server.responses.LogoutResponse;
+import service.requests.LogoutRequest;
+import service.responses.LogoutResponse;
 
 public class LogoutService {
     private MemoryDatabase memoryDatabase;

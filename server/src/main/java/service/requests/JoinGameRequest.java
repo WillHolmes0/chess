@@ -1,4 +1,4 @@
-package server.requests;
+package service.requests;
 
 public record JoinGameRequest (String playerColor, int gameID, String authorization) {
 }

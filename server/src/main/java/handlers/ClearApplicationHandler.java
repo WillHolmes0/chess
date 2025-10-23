@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import io.javalin.http.Context;
-import server.exception.MessageWrapper;
+import service.exception.MessageWrapper;
 import service.ClearApplicationService;
 
 public class ClearApplicationHandler {

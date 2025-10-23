@@ -1,4 +1,4 @@
-package server.exception;
+package service.exception;
 
 public class BadRequestException extends RuntimeException {
     private int code = 400;

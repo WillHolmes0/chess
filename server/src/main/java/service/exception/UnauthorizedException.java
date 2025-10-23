@@ -1,4 +1,4 @@
-package server.exception;
+package service.exception;
 
 public class UnauthorizedException extends RuntimeException {
     private int code = 401;

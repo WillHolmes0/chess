@@ -5,12 +5,12 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
-import server.exception.BadRequestException;
-import server.exception.UnauthorizedException;
+import service.exception.BadRequestException;
+import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import server.requests.CreateGameRequest;
-import server.responses.CreateGameResponse;
+import service.requests.CreateGameRequest;
+import service.responses.CreateGameResponse;
 
 import java.util.Random;
 

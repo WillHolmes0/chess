@@ -1,4 +1,4 @@
-package server.exception;
+package service.exception;
 
 public record MessageWrapper(String message) {
 }

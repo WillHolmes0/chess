@@ -3,13 +3,13 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.BadRequestException;
-import server.exception.MessageWrapper;
-import server.exception.UnauthorizedException;
+import service.exception.BadRequestException;
+import service.exception.MessageWrapper;
+import service.exception.UnauthorizedException;
 import io.javalin.http.Context;
-import server.requests.LoginRequest;
+import service.requests.LoginRequest;
 import service.LoginService;
-import server.responses.LoginResponse;
+import service.responses.LoginResponse;
 
 public class LoginHandler {
     private MemoryDatabase memoryDatabase;

@@ -3,11 +3,11 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.BadRequestException;
-import server.exception.MessageWrapper;
-import server.exception.UnauthorizedException;
-import server.requests.CreateGameRequest;
-import server.responses.CreateGameResponse;
+import service.exception.BadRequestException;
+import service.exception.MessageWrapper;
+import service.exception.UnauthorizedException;
+import service.requests.CreateGameRequest;
+import service.responses.CreateGameResponse;
 import service.CreateGameService;
 import io.javalin.http.Context;
 

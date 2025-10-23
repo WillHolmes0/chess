@@ -3,13 +3,13 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.AlreadyTakenException;
-import server.exception.BadRequestException;
-import server.exception.MessageWrapper;
-import server.exception.UnauthorizedException;
+import service.exception.AlreadyTakenException;
+import service.exception.BadRequestException;
+import service.exception.MessageWrapper;
+import service.exception.UnauthorizedException;
 import io.javalin.http.Context;
-import server.requests.JoinGameRequest;
-import server.responses.JoinGameResponse;
+import service.requests.JoinGameRequest;
+import service.responses.JoinGameResponse;
 import service.JoinGameService;
 
 public class JoinGameHandler {

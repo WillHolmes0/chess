@@ -1,4 +1,4 @@
-package server.exception;
+package service.exception;
 
 public class AlreadyTakenException extends RuntimeException {
     private int code = 403;

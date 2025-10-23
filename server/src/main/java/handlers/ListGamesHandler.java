@@ -3,10 +3,10 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.MessageWrapper;
-import server.exception.UnauthorizedException;
-import server.requests.ListGamesRequest;
-import server.responses.ListGamesResponse;
+import service.exception.MessageWrapper;
+import service.exception.UnauthorizedException;
+import service.requests.ListGamesRequest;
+import service.responses.ListGamesResponse;
 import service.ListGamesService;
 import io.javalin.http.Context;
 

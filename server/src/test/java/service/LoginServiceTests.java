@@ -3,9 +3,9 @@ package service;
 import dataaccess.MemoryDatabase;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import server.exception.UnauthorizedException;
-import server.requests.LoginRequest;
-import server.responses.LoginResponse;
+import service.exception.UnauthorizedException;
+import service.requests.LoginRequest;
+import service.responses.LoginResponse;
 
 public class LoginServiceTests {
     private String authToken;

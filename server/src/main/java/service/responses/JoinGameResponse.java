@@ -1,4 +1,4 @@
-package server.responses;
+package service.responses;
 
 public record JoinGameResponse() {
 }

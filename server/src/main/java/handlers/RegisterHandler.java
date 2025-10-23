@@ -3,12 +3,12 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.AlreadyTakenException;
-import server.exception.BadRequestException;
+import service.exception.AlreadyTakenException;
+import service.exception.BadRequestException;
 import io.javalin.http.Context;
-import server.exception.MessageWrapper;
-import server.requests.RegisterRequest;
-import server.responses.RegisterResponse;
+import service.exception.MessageWrapper;
+import service.requests.RegisterRequest;
+import service.responses.RegisterResponse;
 import service.RegisterService;
 
 public class RegisterHandler {

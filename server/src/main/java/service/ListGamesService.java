@@ -4,11 +4,11 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
-import server.exception.UnauthorizedException;
+import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import server.requests.ListGamesRequest;
-import server.responses.ListGamesResponse;
+import service.requests.ListGamesRequest;
+import service.responses.ListGamesResponse;
 
 import java.util.ArrayList;
 import java.util.Set;

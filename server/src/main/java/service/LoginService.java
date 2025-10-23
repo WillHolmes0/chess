@@ -4,13 +4,13 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryDatabase;
 import dataaccess.MemoryUserDAO;
-import server.exception.AlreadyTakenException;
-import server.exception.BadRequestException;
+import service.exception.AlreadyTakenException;
+import service.exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
-import server.requests.LoginRequest;
-import server.responses.LoginResponse;
-import server.exception.UnauthorizedException;
+import service.requests.LoginRequest;
+import service.responses.LoginResponse;
+import service.exception.UnauthorizedException;
 
 public class LoginService {
     private MemoryDatabase memoryDatabase;

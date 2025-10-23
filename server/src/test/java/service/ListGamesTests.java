@@ -7,12 +7,9 @@ import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.exception.BadRequestException;
-import server.exception.UnauthorizedException;
-import server.requests.ListGamesRequest;
-import server.responses.ListGamesResponse;
-
-import java.util.ArrayList;
+import service.exception.UnauthorizedException;
+import service.requests.ListGamesRequest;
+import service.responses.ListGamesResponse;
 
 public class ListGamesTests {
 

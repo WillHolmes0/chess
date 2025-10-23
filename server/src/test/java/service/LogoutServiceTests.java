@@ -7,9 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import server.requests.LoginRequest;
-import server.requests.LogoutRequest;
-import server.responses.LogoutResponse;
+import service.requests.LogoutRequest;
+import service.responses.LogoutResponse;
 
 public class LogoutServiceTests {
     private static final Logger log = LoggerFactory.getLogger(LogoutServiceTests.class);

@@ -5,9 +5,9 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.exception.AlreadyTakenException;
-import server.requests.RegisterRequest;
-import server.responses.RegisterResponse;
+import service.exception.AlreadyTakenException;
+import service.requests.RegisterRequest;
+import service.responses.RegisterResponse;
 
 public class RegisterServiceTests {
     private MemoryDatabase memoryDatabase;

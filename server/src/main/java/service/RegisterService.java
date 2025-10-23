@@ -3,12 +3,12 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryDatabase;
-import server.exception.AlreadyTakenException;
-import server.exception.BadRequestException;
+import service.exception.AlreadyTakenException;
+import service.exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
-import server.requests.RegisterRequest;
-import server.responses.RegisterResponse;
+import service.requests.RegisterRequest;
+import service.responses.RegisterResponse;
 
 public class RegisterService {
     private MemoryDatabase memoryDatabase;

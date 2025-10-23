@@ -3,10 +3,10 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
-import server.exception.MessageWrapper;
-import server.exception.UnauthorizedException;
-import server.requests.LogoutRequest;
-import server.responses.LogoutResponse;
+import service.exception.MessageWrapper;
+import service.exception.UnauthorizedException;
+import service.requests.LogoutRequest;
+import service.responses.LogoutResponse;
 import service.LogoutService;
 import io.javalin.http.Context;
 

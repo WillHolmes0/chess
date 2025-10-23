@@ -1,13 +1,11 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.MemoryDatabase;
 import model.AuthData;
-import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import server.exception.BadRequestException;
-import server.requests.CreateGameRequest;
+import service.exception.BadRequestException;
+import service.requests.CreateGameRequest;
 
 public class CreateGameTests {
 

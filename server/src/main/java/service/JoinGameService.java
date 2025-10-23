@@ -5,13 +5,13 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryDatabase;
-import server.exception.AlreadyTakenException;
-import server.exception.BadRequestException;
-import server.exception.UnauthorizedException;
+import service.exception.AlreadyTakenException;
+import service.exception.BadRequestException;
+import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import server.requests.JoinGameRequest;
-import server.responses.JoinGameResponse;
+import service.requests.JoinGameRequest;
+import service.responses.JoinGameResponse;
 
 public class JoinGameService {
     private MemoryDatabase memoryDatabase;

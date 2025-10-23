@@ -5,8 +5,8 @@ import dataaccess.MemoryDatabase;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
-import server.exception.AlreadyTakenException;
-import server.requests.JoinGameRequest;
+import service.exception.AlreadyTakenException;
+import service.requests.JoinGameRequest;
 
 public class JoinGameTests {
     private String authToken = "bypass";
