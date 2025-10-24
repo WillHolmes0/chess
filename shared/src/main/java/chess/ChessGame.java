@@ -43,7 +43,7 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition)  {
+    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = chessBoard.getPiece(startPosition);
         Collection<ChessMove> allMoves = piece.pieceMoves(chessBoard, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -79,11 +79,15 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (!isMovablePiece(move.getStartPosition())) {
+            throw new InvalidMoveException("Error: no valid piece to move at that position");
+        }
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (validMoves.contains(move)) {
             ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
             chessBoard.addPiece(move.getEndPosition(), piece);
             chessBoard.addPiece(move.getStartPosition(), null);
+            teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         }
         throw new InvalidMoveException("Error: move is invalid");
     }
@@ -194,6 +198,14 @@ public class ChessGame {
                 move.getEndPosition().getRow() + 1,
                 move.getEndPosition().getColumn() + 1
         );
+    }
+
+    private boolean isMovablePiece(ChessPosition position) {
+        ChessPiece piece = chessBoard.getPiece(position);
+        if (piece != null && piece.getTeamColor() == teamTurn) {
+            return true;
+        }
+        return false;
     }
 
     @Override
