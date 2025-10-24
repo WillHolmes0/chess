@@ -50,6 +50,7 @@ public class ChessGame {
         for (ChessMove move : allMoves) {
             if (!putsInCheck(move)) {
                 validMoves.add(move);
+                printMove(move);
             }
         }
         return validMoves;
@@ -98,7 +99,7 @@ public class ChessGame {
             for (int j = 1; j <=8; j++ ) {
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece piece = chessBoard.getPiece(position);
-                if (piece.getTeamColor() != teamColor) {
+                if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> opposingMoves = piece.pieceMoves(chessBoard, position);
                     for (ChessMove move : opposingMoves) {
                         if (move.getEndPosition().equals(kingPosition)) {
@@ -180,6 +181,15 @@ public class ChessGame {
             }
         }
         return null;
+    }
+
+    private void printMove(ChessMove move) {
+        System.out.printf("Start position: %d, %d  End position %d, %d\n",
+                move.getStartPosition().getRow() + 1,
+                move.getStartPosition().getColumn() + 1,
+                move.getEndPosition().getRow() + 1,
+                move.getEndPosition().getColumn() + 1
+        );
     }
 
     @Override
