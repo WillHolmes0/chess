@@ -128,15 +128,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition position = new ChessPosition(i, j);
-                    if (!(validMoves(position).isEmpty()) && chessBoard.getPiece(position).getTeamColor() != teamColor) {
-                        return false;
-                    }
-                }
-            }
+        if (isInCheck(teamColor) && noValidMoves(teamColor)) {
             return true;
         }
         return false;
@@ -150,15 +142,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition position = new ChessPosition(i, j);
-                    if (!(validMoves(position).isEmpty()) && chessBoard.getPiece(position).getTeamColor() != teamColor) {
-                        return false;
-                    }
-                }
-            }
+        if (!isInCheck(teamColor) && noValidMoves(teamColor)) {
             return true;
         }
         return false;
@@ -180,6 +164,21 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return chessBoard;
+    }
+
+    private boolean noValidMoves(TeamColor teamColor) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece opposingPiece = chessBoard.getPiece(position);
+                if (opposingPiece != null && opposingPiece.getTeamColor() == teamColor) {
+                    if (!validMoves(position).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private ChessPosition findKing(TeamColor teamColor) {
