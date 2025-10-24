@@ -61,7 +61,8 @@ public class ChessGame {
         ChessPiece takenPiece = chessBoard.getPiece(potentialMove.getEndPosition());
         chessBoard.addPiece(potentialMove.getStartPosition(), null);
         chessBoard.addPiece(potentialMove.getEndPosition(), piece);
-        boolean response = (isInCheck(teamTurn)) ? true : false;
+
+        boolean response = (isInCheck(piece.getTeamColor())) ? true : false;
         resetMove(potentialMove, piece, takenPiece);
         return response;
     }
