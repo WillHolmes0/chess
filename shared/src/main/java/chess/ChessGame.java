@@ -55,25 +55,6 @@ public class ChessGame {
         return validMoves;
     }
 
-    public boolean movesIntoCheck(ChessPosition potentialPosition, TeamColor teamColor) {
-
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPosition opposingPosition = new ChessPosition(i, j);
-                ChessPiece opposingPiece = chessBoard.getPiece(opposingPosition);
-                if (opposingPiece.getTeamColor() != teamColor) {
-                   Collection<ChessMove> opposingMoves = opposingPiece.pieceMoves(chessBoard, opposingPosition);
-                   for (ChessMove opposingMove : opposingMoves) {
-                       if (opposingMove.getEndPosition() == potentialPosition) {
-                           return true;
-                       }
-                   }
-                }
-            }
-        }
-        return false;
-    }
-
     public boolean putsInCheck(ChessMove potentialMove) {
         ChessPiece piece = chessBoard.getPiece(potentialMove.getStartPosition());
         ChessPiece takenPiece = chessBoard.getPiece(potentialMove.getEndPosition());
@@ -87,15 +68,6 @@ public class ChessGame {
     public void resetMove(ChessMove move, ChessPiece movedPiece, ChessPiece takenPiece) {
         chessBoard.addPiece(move.getStartPosition(), movedPiece);
         chessBoard.addPiece(move.getEndPosition(), takenPiece);
-    }
-
-    public boolean opensToCheck(ChessPosition currentPosition, TeamColor teamColor) {
-        ChessPiece piece = chessBoard.getPiece(currentPosition);
-        chessBoard.addPiece(currentPosition, null);
-        if (isInCheck(teamColor)) {
-            return true;
-        }
-        return false;
     }
 
     /**
