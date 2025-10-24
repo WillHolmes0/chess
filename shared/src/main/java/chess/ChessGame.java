@@ -87,9 +87,13 @@ public class ChessGame {
             ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
             chessBoard.addPiece(move.getEndPosition(), piece);
             chessBoard.addPiece(move.getStartPosition(), null);
+            if (move.getPromotionPiece() != null) {
+                promotePiece(move.getEndPosition(), move.getPromotionPiece());
+            }
             teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        } else {
+            throw new InvalidMoveException("Error: move is invalid");
         }
-        throw new InvalidMoveException("Error: move is invalid");
     }
 
     /**
@@ -206,6 +210,11 @@ public class ChessGame {
             return true;
         }
         return false;
+    }
+
+    private void promotePiece(ChessPosition position, ChessPiece.PieceType promotionType) {
+        ChessPiece promotionPiece = new ChessPiece(chessBoard.getPiece(position).getTeamColor(), promotionType);
+        chessBoard.addPiece(position, promotionPiece);
     }
 
     @Override
