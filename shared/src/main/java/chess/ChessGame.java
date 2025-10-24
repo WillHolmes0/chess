@@ -11,8 +11,58 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
+
     private TeamColor teamTurn;
     private ChessBoard chessBoard;
+
+    private boolean noValidMoves(TeamColor teamColor) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece opposingPiece = chessBoard.getPiece(position);
+                if (opposingPiece != null && opposingPiece.getTeamColor() == teamColor) {
+                    if (!validMoves(position).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private ChessPosition findKing(TeamColor teamColor) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece piece = chessBoard.getPiece(new ChessPosition(i, j));
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return new ChessPosition(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+    private void printMove(ChessMove move) {
+        System.out.printf("Start position: %d, %d  End position %d, %d\n",
+                move.getStartPosition().getRow() + 1,
+                move.getStartPosition().getColumn() + 1,
+                move.getEndPosition().getRow() + 1,
+                move.getEndPosition().getColumn() + 1
+        );
+    }
+
+    private boolean isMovablePiece(ChessPosition position) {
+        ChessPiece piece = chessBoard.getPiece(position);
+        if (piece != null && piece.getTeamColor() == teamTurn) {
+            return true;
+        }
+        return false;
+    }
+
+    private void promotePiece(ChessPosition position, ChessPiece.PieceType promotionType) {
+        ChessPiece promotionPiece = new ChessPiece(chessBoard.getPiece(position).getTeamColor(), promotionType);
+        chessBoard.addPiece(position, promotionPiece);
+    }
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
@@ -51,7 +101,6 @@ public class ChessGame {
         for (ChessMove move : allMoves) {
             if (!putsInCheck(move)) {
                 validMoves.add(move);
-                printMove(move);
             }
         }
         return validMoves;
@@ -165,56 +214,6 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return chessBoard;
-    }
-
-    private boolean noValidMoves(TeamColor teamColor) {
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece opposingPiece = chessBoard.getPiece(position);
-                if (opposingPiece != null && opposingPiece.getTeamColor() == teamColor) {
-                    if (!validMoves(position).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private ChessPosition findKing(TeamColor teamColor) {
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPiece piece = chessBoard.getPiece(new ChessPosition(i, j));
-                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                    System.out.printf("King position: %d, %d\t", i, j);
-                    return new ChessPosition(i, j);
-                }
-            }
-        }
-        return null;
-    }
-
-    private void printMove(ChessMove move) {
-        System.out.printf("Start position: %d, %d  End position %d, %d\n",
-                move.getStartPosition().getRow() + 1,
-                move.getStartPosition().getColumn() + 1,
-                move.getEndPosition().getRow() + 1,
-                move.getEndPosition().getColumn() + 1
-        );
-    }
-
-    private boolean isMovablePiece(ChessPosition position) {
-        ChessPiece piece = chessBoard.getPiece(position);
-        if (piece != null && piece.getTeamColor() == teamTurn) {
-            return true;
-        }
-        return false;
-    }
-
-    private void promotePiece(ChessPosition position, ChessPiece.PieceType promotionType) {
-        ChessPiece promotionPiece = new ChessPiece(chessBoard.getPiece(position).getTeamColor(), promotionType);
-        chessBoard.addPiece(position, promotionPiece);
     }
 
     @Override
