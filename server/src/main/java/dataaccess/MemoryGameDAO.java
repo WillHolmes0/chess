@@ -12,18 +12,22 @@ public class MemoryGameDAO implements GameDAO {
         this.memoryDatabase = memoryDatabase;
     }
 
+    @Override
     public void createGame(GameData gameData) {
         memoryDatabase.games().put(String.valueOf(gameData.gameID()), gameData);
     }
 
+    @Override
     public GameData getGame(int gameID) {
         return memoryDatabase.games().get(String.valueOf(gameID));
     }
 
-    public Set<String> getGameKeys() {
+    @Override
+    public Set<String> getGameKeys() throws DataAccessException {
         return memoryDatabase.games().keySet();
     }
 
+    @Override
     public void setPlayer(String username, ChessGame.TeamColor playerColor, int gameID) {
         GameData newGame;
         GameData game = memoryDatabase.games().get(String.valueOf(gameID));
@@ -35,6 +39,7 @@ public class MemoryGameDAO implements GameDAO {
         memoryDatabase.games().put(String.valueOf(newGame.gameID()), newGame);
     }
 
+    @Override
     public void clearDatabase() {
         memoryDatabase.games().clear();
     }

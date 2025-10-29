@@ -8,15 +8,18 @@ public class MemoryUserDAO implements UserDAO {
         this.memoryDatabase = memoryDatabase;
     }
 
+    @Override
     public void addUser(UserData userData) {
         memoryDatabase.users().put(userData.username(), userData);
         System.out.println(memoryDatabase.users());
     }
 
+    @Override
     public UserData getUser(String username) {
         return memoryDatabase.users().get(username);
     }
 
+    @Override
     public void clearDatabase() {
         memoryDatabase.users().clear();
     }
