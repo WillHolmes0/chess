@@ -40,4 +40,22 @@ public class DatabaseAuthDAOTests {
 
     }
 
+    @Test
+    public void generateAuthTokenSucess() {
+        String authToken = databaseAuthDAO.generateAuthToken();
+        Assertions.assertEquals(36, authToken.length());
+    }
+
+    @Test
+    public void clearDatabaseTest() {
+        String authToken = databaseAuthDAO.generateAuthToken();
+        try {
+            databaseAuthDAO.addAuthToken(new AuthData(authToken, "user1"));
+        } catch (DataAccessException e) {
+            Assertions.fail("threw DataAccessException when adding the authToken");
+        }
+        Assertions.assertDoesNotThrow(() -> {databaseAuthDAO.clearDatabase();});
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseAuthDAO.getAuthData(authToken);});
+    }
+
 }

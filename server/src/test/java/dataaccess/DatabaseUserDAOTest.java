@@ -71,6 +71,7 @@ public class DatabaseUserDAOTest {
             Assertions.fail("Error: threw DataAccessException when adding a user");
         }
         Assertions.assertDoesNotThrow(() -> {databaseUserDAO.clearDatabase();});
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseUserDAO.getUser("willh");});
     }
 
 }
