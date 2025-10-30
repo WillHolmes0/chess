@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import org.xml.sax.SAXException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -70,12 +71,31 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuthToken(String authToken) throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement =
+                    """
+                    REMOVE FROM authTokens
+                    WHERE authToken=?;
+                    """;
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: could not delete the AuthToken row specified", e);
+        }
     }
 
     @Override
     public void clearDatabase() throws DataAccessException {
-        
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "DROP TABLE authTokens;";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: could not clear 'authTokens' table");
+        }
     }
 
     private void createTableIfNotExists() throws DataAccessException {
