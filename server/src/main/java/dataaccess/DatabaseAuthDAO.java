@@ -74,7 +74,7 @@ public class DatabaseAuthDAO implements AuthDAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement =
                     """
-                    REMOVE FROM authTokens
+                    DELETE FROM authTokens
                     WHERE authToken=?;
                     """;
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
