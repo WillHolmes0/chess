@@ -4,6 +4,8 @@ package dataaccess;
 import model.UserData;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DatabaseUserDAO implements UserDAO{
@@ -19,16 +21,24 @@ public class DatabaseUserDAO implements UserDAO{
 
     @Override
     public void addUser(UserData userData) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
+        try (Connection conn = DatabaseManager.getConnection()) {
             String statement =
                 """
-                INSERT INTO users (id, name)
-                VALUES (1, 'testuser');
+                INSERT INTO users (username, password, email)
+                VALUES (?, ?, ?)
                 """;
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                var result = preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
+                System.out.println("part");
+                preparedStatement.setString(1, userData.username());
+                System.out.println("part");
+                preparedStatement.setString(2, userData.password());
+                System.out.println("part");
+                preparedStatement.setString(3, userData.email());
+                System.out.println("part");
+                preparedStatement.executeUpdate();
+                System.out.println("part");
             } catch (SQLException e) {
-                throw e;
+                throw new DataAccessException("inner block", e);
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not add the user", e);
@@ -37,10 +47,29 @@ public class DatabaseUserDAO implements UserDAO{
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            var statement
-//        }
-        throw new DataAccessException("not implemented");
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement =
+                """
+                SELECT * FROM users WHERE username=?
+                """;
+            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, username);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        UserData result = new UserData(
+                                resultSet.getString("username"),
+                                resultSet.getString("password"),
+                                resultSet.getString("email")
+                        );
+                        return result;
+                    } else {
+                        throw new DataAccessException("Error: specified user does not exist in the database");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: could not retrieve user", e);
+        }
     }
 
     @Override
@@ -51,14 +80,15 @@ public class DatabaseUserDAO implements UserDAO{
     private final String configureUserTableStatement =
             """
             CREATE TABLE IF NOT EXISTS users (
-            id int,
-            name varchar(128)
+            username varchar(128),
+            password varchar(128),
+            email varchar(256)
             )
             """;
 
     private void configureUserDatabase() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(configureUserTableStatement)) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(configureUserTableStatement)) {
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 throw e;
