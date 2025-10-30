@@ -36,16 +36,13 @@ public class DatabaseUserDAOTest {
         UserData startUserData = new UserData("willh", "passy", "example@gmail.com");
         try {
             databaseUserDAO.addUser(startUserData);
-        } catch (DataAccessException e) {
-            System.out.println("could not add user");
-        }
-        try {
             UserData retrivedUser = databaseUserDAO.getUser("willh");
             Assertions.assertEquals(startUserData.username(), retrivedUser.username());
             Assertions.assertEquals(startUserData.password(), retrivedUser.password());
             Assertions.assertEquals(startUserData.email(), retrivedUser.email());
         } catch (DataAccessException e) {
-            System.out.println("could not retrive user");
+            System.out.println(e.getMessage());
+            Assertions.fail("Error: threw DataAcessException");
         }
     }
 
@@ -55,6 +52,7 @@ public class DatabaseUserDAOTest {
             databaseUserDAO.addUser(new UserData("willh", "passy", "example@gmail.com"));
         } catch (DataAccessException e) {
             System.out.println("Could not add user");
+            Assertions.fail("Error: threw DataAccessException when adding a user");
         }
         Assertions.assertThrows(DataAccessException.class, () -> {databaseUserDAO.getUser("hwill");});
     }
@@ -70,6 +68,7 @@ public class DatabaseUserDAOTest {
             databaseUserDAO.addUser(new UserData("willh", "passy", "example@gmail.com"));
         } catch (DataAccessException e) {
             System.out.println("Error: could not add a user");
+            Assertions.fail("Error: threw DataAccessException when adding a user");
         }
         Assertions.assertDoesNotThrow(() -> {databaseUserDAO.clearDatabase();});
     }

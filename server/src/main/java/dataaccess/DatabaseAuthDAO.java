@@ -61,7 +61,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                 """;
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authData.authToken());
-                ps.setString(1, authData.username());
+                ps.setString(2, authData.username());
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
