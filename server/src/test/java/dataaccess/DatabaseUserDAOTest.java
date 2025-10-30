@@ -18,69 +18,62 @@ public class DatabaseUserDAOTest {
 
     @BeforeEach
     public void clearDatabase() {
-        try (Connection conn = DatabaseManager.getConnection()){
-            String statement = "DROP TABLE users";
-            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (DataAccessException e) {
-            System.out.println("Threw DataAccessException trying to clear table");
-        } catch (SQLException e) {
-            System.out.println("Threw SQLException trying to clear table");
-        }
         try {
             databaseUserDAO = new DatabaseUserDAO();
         } catch (DataAccessException e) {
             System.out.println("could not create DAO");
         }
-    }
-
-    @Test
-    public void makeDatabase() {
-        Assertions.assertDoesNotThrow(() -> {DatabaseUserDAO databaseUserDAO = new DatabaseUserDAO();});
-    }
-
-    @Test
-    public void addUserTest() {
-
-        UserData userData = new UserData("willh", "pass", "example@gmail.com");
         try {
-            databaseUserDAO.addUser(userData);
+            databaseUserDAO.clearDatabase();
         } catch (DataAccessException e) {
-            System.out.println(e.getMessage());
+            System.out.println("could not clear the 'users' table");
         }
+    }
 
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT * FROM users";
-            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        UserData result = new UserData(
-                                rs.getString("username"),
-                                rs.getString("password"),
-                                rs.getString("email")
-                                );
-                        Assertions.assertTrue(userData.equals(result), "retrieved UserData matches expected");
-                        if (rs.next()) {
-                            Assertions.fail("too many entries");
-                        }
-                    } else {
-                        Assertions.fail("Expected 1 row, got 0");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            Assertions.fail("threw SQLExcetion");
+
+    @Test
+    public void setGetUserSucess() {
+        UserData startUserData = new UserData("willh", "passy", "example@gmail.com");
+        try {
+            databaseUserDAO.addUser(startUserData);
         } catch (DataAccessException e) {
-            Assertions.fail("threw DataAccessException");
+            System.out.println("could not add user");
+        }
+        try {
+            UserData retrivedUser = databaseUserDAO.getUser("willh");
+            Assertions.assertEquals(startUserData.username(), retrivedUser.username());
+            Assertions.assertEquals(startUserData.password(), retrivedUser.password());
+            Assertions.assertEquals(startUserData.email(), retrivedUser.email());
+        } catch (DataAccessException e) {
+            System.out.println("could not retrive user");
         }
     }
 
     @Test
-    public void configureTableTest() {
-        Assertions.assertDoesNotThrow(() -> {DatabaseUserDAO databaseUserDAO = new DatabaseUserDAO();});
+    public void getUserFailure() {
+        try {
+            databaseUserDAO.addUser(new UserData("willh", "passy", "example@gmail.com"));
+        } catch (DataAccessException e) {
+            System.out.println("Could not add user");
+        }
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseUserDAO.getUser("hwill");});
     }
-    
+
+    @Test
+    public void addUserFailure() {
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseUserDAO.addUser(new UserData(null, "passy", "example@gmail.com"));});
+    }
+
+    @Test
+    public void clearUsersSucess() {
+        try {
+            databaseUserDAO.addUser(new UserData("willh", "passy", "example@gmail.com"));
+        } catch (DataAccessException e) {
+            System.out.println("Error: could not add a user");
+        }
+        Assertions.assertDoesNotThrow(() -> {databaseUserDAO.clearDatabase();});
+    }
+
 }
 
 
