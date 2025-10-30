@@ -12,12 +12,12 @@ public class DatabaseUserDAO implements UserDAO{
 
     public DatabaseUserDAO() throws DataAccessException {
             DatabaseManager.createDatabase();
-            createUserTableIfNonexistant();
+            createTableIfNonexistant();
     }
 
     @Override
     public void addUser(UserData userData) throws DataAccessException {
-        createUserTableIfNonexistant();
+        createTableIfNonexistant();
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement =
                 """
@@ -37,7 +37,7 @@ public class DatabaseUserDAO implements UserDAO{
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        createUserTableIfNonexistant();
+        createTableIfNonexistant();
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement =
                 """
@@ -52,6 +52,9 @@ public class DatabaseUserDAO implements UserDAO{
                                 resultSet.getString("password"),
                                 resultSet.getString("email")
                         );
+                        if (resultSet.next()) {
+                            throw new DataAccessException("Error: more than one result for the provided username");
+                        }
                         return result;
                     } else {
                         throw new DataAccessException("Error: specified user does not exist in the database");
@@ -81,16 +84,16 @@ public class DatabaseUserDAO implements UserDAO{
             username varchar(128) NOT NULL,
             password varchar(128) NOT NULL,
             email varchar(256) NOT NULL
-            )
+            );
             """;
 
-    private void createUserTableIfNonexistant() throws DataAccessException {
+    private void createTableIfNonexistant() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(configureUserTableStatement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("failed to configure the user table", e);
+            throw new DataAccessException("Error: failure trying to create users table if it does not exist", e);
         }
 
     }
