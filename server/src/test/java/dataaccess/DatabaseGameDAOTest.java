@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,27 @@ public class DatabaseGameDAOTest {
             databaseGameDAO.clearDatabase();
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    public void setPlayerSucess() {
+        int gameID = 3333;
+        String newPlayer = "noah";
+        ChessGame startingChessGame = new ChessGame();
+        GameData startingGameData = new GameData(gameID, "will", null, "whatever", startingChessGame);
+        try {
+            databaseGameDAO.createGame(startingGameData);
+            databaseGameDAO.setPlayer(newPlayer, ChessGame.TeamColor.BLACK, gameID);
+            GameData result = databaseGameDAO.getGame(gameID);
+            Assertions.assertEquals(startingGameData.gameID(), result.gameID());
+            Assertions.assertEquals(startingGameData.whiteUsername(), result.whiteUsername());
+            Assertions.assertNotEquals(startingGameData.blackUsername(), result.blackUsername());
+            Assertions.assertEquals(newPlayer, result.blackUsername());
+            Assertions.assertEquals(startingGameData.gameName(), result.gameName());
+            Assertions.assertTrue(startingGameData.game().equals(result.game()));
+        } catch (DataAccessException e) {
+            Assertions.fail(e.getMessage());
         }
     }
 
@@ -46,5 +68,19 @@ public class DatabaseGameDAOTest {
         } catch (DataAccessException e) {
             Assertions.fail("threw DataAccessException");
         }
+    }
+
+    @Test
+    public void clearDatabaseSucess() {
+        int gameID = 4444;
+        ChessGame chessGame = new ChessGame();
+        GameData gameData = new GameData(gameID, null, "willh", "clearablegame", chessGame);
+        try {
+            databaseGameDAO.createGame(gameData);
+        } catch (DataAccessException e) {
+            Assertions.fail("threw DataAccessException when adding new game");
+        }
+        Assertions.assertDoesNotThrow(() -> {databaseGameDAO.clearDatabase();});
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseGameDAO.getGame(gameID);});
     }
 }
