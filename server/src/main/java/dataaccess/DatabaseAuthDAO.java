@@ -23,6 +23,7 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuthData(String authToken) throws DataAccessException {
+        createTableIfNotExists();
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement =
                 """

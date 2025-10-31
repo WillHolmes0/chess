@@ -69,7 +69,7 @@ public class DatabaseGameDAO implements GameDAO {
                         }
                         return result;
                     } else {
-                        throw new DataAccessException("got no results for the given gameId");
+                        return null;
                     }
                 }
             }

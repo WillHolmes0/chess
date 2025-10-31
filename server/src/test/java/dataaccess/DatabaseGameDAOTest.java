@@ -80,11 +80,15 @@ public class DatabaseGameDAOTest {
         GameData gameData = new GameData(gameID, null, "willh", "clearablegame", chessGame);
         try {
             databaseGameDAO.createGame(gameData);
+            Assertions.assertDoesNotThrow(() -> {databaseGameDAO.clearDatabase();});
+            DatabaseGameDAO newdatabaseGameDAO = new DatabaseGameDAO();
+            GameData result = newdatabaseGameDAO.getGame(gameID);
+            Assertions.assertNull(result);
         } catch (DataAccessException e) {
             Assertions.fail("threw DataAccessException when adding new game");
         }
-        Assertions.assertDoesNotThrow(() -> {databaseGameDAO.clearDatabase();});
-        Assertions.assertThrows(DataAccessException.class, () -> {databaseGameDAO.getGame(gameID);});
+
+
     }
 
     @Test

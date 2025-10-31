@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import model.AuthData;
 import model.GameData;
@@ -24,6 +25,12 @@ public class ListGamesTests {
         memoryDatabase.games().put("1", new GameData(1, null, null, "game1", new ChessGame()));
         memoryDatabase.games().put("32", new GameData(32, "user1", null, "game2", new ChessGame()));
         memoryDatabase.games().put("1008", new GameData(1008, "user2", "user3", "game3", new ChessGame()));
+        ClearApplicationService clearApplicationService = new ClearApplicationService(memoryDatabase);
+        try {
+            clearApplicationService.clearAll();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test

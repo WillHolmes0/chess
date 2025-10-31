@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -16,6 +17,12 @@ public class LoginServiceTests {
         memoryDatabase = new MemoryDatabase();
         memoryDatabase.users().put("user1", new UserData("user1", "user1password", "user1email"));
         memoryDatabase.users().put("user2", new UserData("user2", "user2password", "user2email"));
+        ClearApplicationService clearApplicationService = new ClearApplicationService(memoryDatabase);
+        try {
+            clearApplicationService.clearAll();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test

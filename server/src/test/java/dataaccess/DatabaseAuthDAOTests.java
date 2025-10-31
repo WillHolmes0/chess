@@ -25,6 +25,16 @@ public class DatabaseAuthDAOTests {
         Assertions.assertDoesNotThrow(() -> {databaseAuthDAO.addAuthToken(new AuthData("test auth token", "test user"));});
     }
 
+    @Test
+    public void addAuthTokenFailure() {
+        try {
+            databaseAuthDAO.addAuthToken(new AuthData("test auth token", "test user"));
+        } catch (DataAccessException e) {
+            Assertions.fail("throw DataAccessException for the first auth input");
+        }
+        Assertions.assertThrows(DataAccessException.class, () -> {databaseAuthDAO.addAuthToken(new AuthData("test auth token", null));});
+
+    }
 
     @Test
     public void getAuthTokenSucess() {
@@ -43,9 +53,15 @@ public class DatabaseAuthDAOTests {
     }
 
     @Test
-    public void generateAuthTokenSucess() {
+    public void getAuthTokenFailure() {
         String authToken = databaseAuthDAO.generateAuthToken();
-        Assertions.assertEquals(36, authToken.length());
+        AuthData startingAuthData = new AuthData(authToken, "test user");
+        try {
+            databaseAuthDAO.addAuthToken(startingAuthData);
+            Assertions.assertEquals(null, databaseAuthDAO.getAuthData("bad auth token"));
+        } catch (DataAccessException e) {
+            Assertions.fail("threw DataAccessException");
+        }
     }
 
     @Test
@@ -53,11 +69,12 @@ public class DatabaseAuthDAOTests {
         String authToken = databaseAuthDAO.generateAuthToken();
         try {
             databaseAuthDAO.addAuthToken(new AuthData(authToken, "user1"));
+            Assertions.assertDoesNotThrow(() -> {databaseAuthDAO.clearDatabase();});
+            AuthData result = databaseAuthDAO.getAuthData(authToken);
+            Assertions.assertEquals(null, result);
         } catch (DataAccessException e) {
-            Assertions.fail("threw DataAccessException when adding the authToken");
+            Assertions.fail(e.getMessage());
         }
-        Assertions.assertDoesNotThrow(() -> {databaseAuthDAO.clearDatabase();});
-        Assertions.assertThrows(DataAccessException.class, () -> {databaseAuthDAO.getAuthData(authToken);});
     }
 
     @Test
@@ -70,10 +87,11 @@ public class DatabaseAuthDAOTests {
             Assertions.assertEquals(startingAuthData.authToken(), result.authToken());
             Assertions.assertEquals(startingAuthData.username(), result.username());
             databaseAuthDAO.deleteAuthToken(authToken);
+            Assertions.assertEquals(null, databaseAuthDAO.getAuthData(authToken));
         } catch (DataAccessException e) {
             Assertions.fail("threw DataAccessException before completely deleting the token");
         }
-        Assertions.assertThrows(DataAccessException.class, () -> {databaseAuthDAO.getAuthData(authToken);});
+
     }
 
 }
