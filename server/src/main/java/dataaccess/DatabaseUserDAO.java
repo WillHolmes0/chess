@@ -12,8 +12,8 @@ import java.sql.SQLException;
 public class DatabaseUserDAO implements UserDAO{
 
     public DatabaseUserDAO() throws DataAccessException {
-            DatabaseManager.createDatabase();
-            createTableIfNonexistant();
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
+        createTableIfNonexistant();
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DatabaseUserDAO implements UserDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Could not add the user", e);
+            throw new DataAccessException("Error: Could not add the user", e);
         }
     }
 
@@ -58,7 +58,7 @@ public class DatabaseUserDAO implements UserDAO{
                         }
                         return result;
                     } else {
-                        throw new DataAccessException("Error: specified user does not exist in the database");
+                        return null;
                     }
                 }
             }
@@ -75,7 +75,7 @@ public class DatabaseUserDAO implements UserDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: could not drop 'users' table", e);
+            throw new DataAccessException("Error: could not drop 'users' table");
         }
     }
 

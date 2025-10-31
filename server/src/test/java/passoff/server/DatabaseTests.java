@@ -131,6 +131,7 @@ public class DatabaseTests {
                 Assertions.assertNotNull(result.getMessage(), "Invalid Request didn't return an error message");
                 Assertions.assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
                         "Error message didn't contain the word \"Error\"");
+                System.out.println(result.getMessage());
             }
         } finally {
             Method loadFromResources = databaseManagerClass.getDeclaredMethod("loadPropertiesFromResources");

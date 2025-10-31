@@ -34,6 +34,7 @@ public class RegisterService {
             String authToken = authDAO.generateAuthToken();
             AuthData authData = new AuthData(authToken, userData.username());
             authDAO.addAuthToken(authData);
+            System.out.println(retrievedUser);
             return new RegisterResponse(authToken, retrievedUser);
         } else {
             throw new AlreadyTakenException("Error: username is already taken");

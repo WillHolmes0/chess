@@ -12,7 +12,7 @@ import java.util.UUID;
 public class DatabaseAuthDAO implements AuthDAO {
 
     public DatabaseAuthDAO() throws DataAccessException{
-        DatabaseManager.createDatabase();
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
         createTableIfNotExists();
     }
 
@@ -41,7 +41,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                         }
                         return result;
                     } else {
-                        throw new DataAccessException("Error: no results for the provided AuthToken");
+                        return null;
                     }
                 }
             }

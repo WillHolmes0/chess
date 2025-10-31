@@ -15,7 +15,7 @@ import java.util.Set;
 public class DatabaseGameDAO implements GameDAO {
 
     public DatabaseGameDAO() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
         createTableIfNonexistant();
     }
 
@@ -114,12 +114,9 @@ public class DatabaseGameDAO implements GameDAO {
                         gameKeys.add(rs.getString("gameID"));
                         while (rs.next()) {
                             gameKeys.add(rs.getString("gameID"));
-                            System.out.println(rs.getString("gameID"));
                         }
-                        return gameKeys;
-                    } else {
-                        throw new DataAccessException("Error: returned no keys");
                     }
+                    return gameKeys;
                 }
             }
         } catch (SQLException e) {
@@ -138,7 +135,7 @@ public class DatabaseGameDAO implements GameDAO {
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("could not drop 'games' table", e);
+            throw new DataAccessException("Error: could not drop 'games' table");
         }
     }
 
@@ -158,7 +155,7 @@ public class DatabaseGameDAO implements GameDAO {
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("could not create 'games' table");
+            throw new DataAccessException("Error: could not create 'games' table");
         }
     }
 }
