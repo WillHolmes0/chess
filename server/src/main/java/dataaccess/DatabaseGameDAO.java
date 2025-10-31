@@ -148,8 +148,8 @@ public class DatabaseGameDAO implements GameDAO {
                     CREATE TABLE IF NOT EXISTS games (
                     gameID int NOT NULL,
                     whiteUsername varchar(128),
-                    blackUsername varchar(128,
-                    gameName varchar(256), NOT NULL,
+                    blackUsername varchar(128),
+                    gameName varchar(256) NOT NULL,
                     game varchar(2048) NOT NULL
                     );
                     """;
@@ -157,7 +157,7 @@ public class DatabaseGameDAO implements GameDAO {
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("could not create games table");
+            throw new DataAccessException("could not create 'games' table");
         }
     }
 }
