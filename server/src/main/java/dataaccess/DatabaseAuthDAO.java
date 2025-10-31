@@ -37,7 +37,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                             rs.getString("username")
                         );
                         if (rs.next()) {
-                            throw new DataAccessException("Error: more than one result for the provided AuthToken");
+                            throw new DataAccessException("more than one result for the provided AuthToken");
                         }
                         return result;
                     } else {
@@ -47,6 +47,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not get authData from provided authToken", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -66,6 +68,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not add authToken to authTokens table", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -83,6 +87,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not delete the AuthToken row specified", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -95,6 +101,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not clear 'authTokens' table");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -112,6 +120,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: failure trying to create authTokens table if it does not exist", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 }

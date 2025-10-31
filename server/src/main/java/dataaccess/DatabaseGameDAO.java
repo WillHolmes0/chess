@@ -39,6 +39,8 @@ public class DatabaseGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not create chessgame", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -63,16 +65,18 @@ public class DatabaseGameDAO implements GameDAO {
                                 new Gson().fromJson(rs.getString("game"), ChessGame.class)
                         );
                         if (rs.next()) {
-                            throw new DataAccessException("Error: got more than one result for the given gameId");
+                            throw new DataAccessException("got more than one result for the given gameId");
                         }
                         return result;
                     } else {
-                        throw new DataAccessException("Error: got no results for the given gameId");
+                        throw new DataAccessException("got no results for the given gameId");
                     }
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: cannot get game", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -100,6 +104,8 @@ public class DatabaseGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not add specified player to specified color", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -121,6 +127,8 @@ public class DatabaseGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not retrieve game keys", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -136,6 +144,8 @@ public class DatabaseGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not drop 'games' table");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -156,6 +166,8 @@ public class DatabaseGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not create 'games' table");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 }

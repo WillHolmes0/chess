@@ -33,6 +33,8 @@ public class DatabaseUserDAO implements UserDAO{
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: Could not add the user", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -54,7 +56,7 @@ public class DatabaseUserDAO implements UserDAO{
                                 resultSet.getString("email")
                         );
                         if (resultSet.next()) {
-                            throw new DataAccessException("Error: more than one result for the provided username");
+                            throw new DataAccessException("more than one result for the provided username");
                         }
                         return result;
                     } else {
@@ -64,6 +66,8 @@ public class DatabaseUserDAO implements UserDAO{
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not retrieve user", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -76,6 +80,8 @@ public class DatabaseUserDAO implements UserDAO{
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: could not drop 'users' table");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
     }
 
@@ -95,8 +101,9 @@ public class DatabaseUserDAO implements UserDAO{
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: failure trying to create users table if it does not exist", e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
         }
-
     }
 }
 
