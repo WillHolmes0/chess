@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import model.AuthData;
@@ -27,7 +28,7 @@ public class LoginService {
         }
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData != null) {
-            if (userData.username().equals(loginRequest.username())  && userData.password().equals(loginRequest.password())) {
+            if (userData.username().equals(loginRequest.username()) && BCrypt.checkpw(loginRequest.password(), userData.password())) {
                 String authToken = authDAO.generateAuthToken();
                 AuthData authData = new AuthData(authToken, userData.username());
                 authDAO.addAuthToken(authData);

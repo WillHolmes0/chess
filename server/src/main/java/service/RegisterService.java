@@ -1,5 +1,6 @@
 package service;
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import model.AuthData;
@@ -25,7 +26,8 @@ public class RegisterService {
         UserData user = userDAO.getUser(registerRequest.username());
         if (user == null) {
             //Add the user to the User Database, then retrieve the username again for the request response which ensures retrieving the user works.
-            UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+            String encryptedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+            UserData userData = new UserData(registerRequest.username(), encryptedPassword, registerRequest.email());
             userDAO.addUser(userData);
             String retrievedUser = userDAO.getUser(registerRequest.username()).username();
             //Generate and Add authToken
