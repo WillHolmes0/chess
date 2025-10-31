@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryDatabase;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import model.AuthData;
@@ -20,14 +17,17 @@ public class LoginService {
     }
 
     public LoginResponse loginUser(LoginRequest loginRequest) throws DataAccessException, AlreadyTakenException, BadRequestException, UnauthorizedException {
+//        UserDAO userDAO = new MemoryUserDAO(memoryDatabase);
+//        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+        UserDAO userDAO = new DatabaseUserDAO();
+        AuthDAO authDAO = new DatabaseAuthDAO();
+
         if (loginRequest.username() == null || loginRequest.password() == null) {
             throw new BadRequestException("Error: missing field");
         }
-        MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData != null) {
             if (userData.username().equals(loginRequest.username())  && userData.password().equals(loginRequest.password())) {
-                MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
                 String authToken = authDAO.generateAuthToken();
                 AuthData authData = new AuthData(authToken, userData.username());
                 authDAO.addAuthToken(authData);

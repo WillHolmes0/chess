@@ -104,8 +104,8 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     @Override
-    public Set<String> getGameKeys() throws DataAccessException {
-        Set<String> gameKeys = new HashSet<>();
+    public HashSet<String> getGameKeys() throws DataAccessException {
+        HashSet<String> gameKeys = new HashSet<>();
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT * FROM games";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -114,6 +114,7 @@ public class DatabaseGameDAO implements GameDAO {
                         gameKeys.add(rs.getString("gameID"));
                         while (rs.next()) {
                             gameKeys.add(rs.getString("gameID"));
+                            System.out.println(rs.getString("gameID"));
                         }
                         return gameKeys;
                     } else {

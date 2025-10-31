@@ -49,7 +49,7 @@ public class DatabaseAuthDAOTests {
     }
 
     @Test
-    public void clearDatabaseSucess() {
+    public void clearDatabaseSuccess() {
         String authToken = databaseAuthDAO.generateAuthToken();
         try {
             databaseAuthDAO.addAuthToken(new AuthData(authToken, "user1"));

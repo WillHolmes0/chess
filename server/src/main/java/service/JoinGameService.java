@@ -1,10 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryDatabase;
+import dataaccess.*;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
@@ -21,14 +18,17 @@ public class JoinGameService {
     }
 
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
+//        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+//        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
+        AuthDAO authDAO = new DatabaseAuthDAO();
+        GameDAO gameDAO = new DatabaseGameDAO();
+
         if (joinGameRequest.playerColor() == null || joinGameRequest.gameID() == 0 || joinGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }
-        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(joinGameRequest.authorization());
         if (authData != null) {
             String username = authData.username();
-            MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
             ChessGame.TeamColor playerColor;
             GameData prospectiveGameData = gameDAO.getGame(joinGameRequest.gameID());
             if (prospectiveGameData == null) {

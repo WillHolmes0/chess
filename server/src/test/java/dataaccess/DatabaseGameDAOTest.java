@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DatabaseGameDAOTest {
     private static DatabaseGameDAO databaseGameDAO;
 
@@ -82,5 +85,29 @@ public class DatabaseGameDAOTest {
         }
         Assertions.assertDoesNotThrow(() -> {databaseGameDAO.clearDatabase();});
         Assertions.assertThrows(DataAccessException.class, () -> {databaseGameDAO.getGame(gameID);});
+    }
+
+    @Test
+    public void getGameKeysSuccess() {
+        int gameIDOne = 4455;
+        int gameIDTwo = 78;
+        int gameIDThree = 234;
+        ChessGame gameOne = new ChessGame();
+        ChessGame gameTwo = new ChessGame();
+        ChessGame gameThree = new ChessGame();
+        GameData gameDataOne = new GameData(gameIDOne, null, null, "gameOne", gameOne);
+        GameData gameDataTwo = new GameData(gameIDTwo, null, null, "gameTwo", gameTwo);
+        GameData gameDataThree = new GameData(gameIDThree, null, null, "gameOne", gameThree);
+        try {
+            databaseGameDAO.createGame(gameDataOne);
+            databaseGameDAO.createGame(gameDataTwo);
+            databaseGameDAO.createGame(gameDataThree);
+            HashSet<String> gameKeys = databaseGameDAO.getGameKeys();
+            Assertions.assertTrue(gameKeys.contains(String.valueOf(gameIDOne)));
+            Assertions.assertTrue(gameKeys.contains(String.valueOf(gameIDTwo)));
+            Assertions.assertTrue(gameKeys.contains(String.valueOf(gameIDThree)));
+        } catch (DataAccessException e) {
+            Assertions.fail(e.getMessage());
+        }
     }
 }

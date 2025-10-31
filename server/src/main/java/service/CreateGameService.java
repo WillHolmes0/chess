@@ -1,10 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryDatabase;
+import dataaccess.*;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
 import model.AuthData;
@@ -22,11 +19,14 @@ public class CreateGameService {
     }
 
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException {
+//        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+//        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
+        AuthDAO authDAO = new DatabaseAuthDAO();
+        GameDAO gameDAO = new DatabaseGameDAO();
+
         if (createGameRequest.gameName() == null || createGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }
-        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
-        MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         AuthData authData = authDAO.getAuthData(createGameRequest.authorization());
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");

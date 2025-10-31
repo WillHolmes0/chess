@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryDatabase;
+import dataaccess.*;
 import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
@@ -21,10 +18,13 @@ public class ListGamesService {
     }
 
     public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws DataAccessException, UnauthorizedException {
-        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+//        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+//        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
+        AuthDAO authDAO = new DatabaseAuthDAO();
+        GameDAO gameDAO = new DatabaseGameDAO();
+
         AuthData authData = authDAO.getAuthData(listGamesRequest.authorization());
         if (authData != null) {
-            MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
             Set<String> gameKeySet = gameDAO.getGameKeys();
             ArrayList<GameData> gameList = new ArrayList<>();
             for (String key : gameKeySet) {

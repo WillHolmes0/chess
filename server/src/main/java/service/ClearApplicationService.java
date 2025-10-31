@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import org.eclipse.jetty.server.Authentication;
 
 public class ClearApplicationService {
     private MemoryDatabase memoryDatabase;
@@ -10,9 +11,12 @@ public class ClearApplicationService {
     }
 
     public void clearAll() throws DataAccessException {
-        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
-        MemoryUserDAO userDAO = new MemoryUserDAO(memoryDatabase);
-        MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
+//        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
+//        UserDAO userDAO = new MemoryUserDAO(memoryDatabase);
+//        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
+        AuthDAO authDAO = new DatabaseAuthDAO();
+        UserDAO userDAO = new DatabaseUserDAO();
+        GameDAO gameDAO = new DatabaseGameDAO();
         authDAO.clearDatabase();
         userDAO.clearDatabase();
         gameDAO.clearDatabase();
