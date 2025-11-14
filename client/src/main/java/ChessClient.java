@@ -1,9 +1,11 @@
 import com.sun.nio.sctp.NotificationHandler;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ChessClient {
-    private boolean signedIn = true;
+    private boolean signedIn = false;
+    private String playerName;
 
     public ChessClient(String serverUrl) {
 
@@ -30,12 +32,20 @@ public class ChessClient {
 
     private String eval(String input) {
         String[] tokens = input.toLowerCase().strip().split(" ");
-        if (tokens.length == 1) {
-            String cmd = tokens[0];
-            return switch (cmd) {
-                case "quit" -> "quit";
-                default -> help();
-            };
+        String cmd = (tokens.length > 0) ? tokens[0] : "help";
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        return switch (cmd) {
+            case "signin" -> signIn(params);
+            case "quit" -> "quit";
+            default -> help();
+        };
+    }
+
+    public String signIn(String... params) {
+        if (params.length >= 1) {
+            signedIn = true;
+            playerName = String.join(" ", params);
+            return String.format("You signed in as %s.", playerName);
         }
         return null;
     }
