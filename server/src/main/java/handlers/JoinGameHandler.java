@@ -8,8 +8,8 @@ import service.exception.BadRequestException;
 import service.exception.MessageWrapper;
 import service.exception.UnauthorizedException;
 import io.javalin.http.Context;
-import service.requests.JoinGameRequest;
-import service.responses.JoinGameResponse;
+import requests.JoinGameRequest;
+import responses.JoinGameResponse;
 import service.JoinGameService;
 
 public class JoinGameHandler {

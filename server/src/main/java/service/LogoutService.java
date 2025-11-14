@@ -3,8 +3,8 @@ package service;
 import dataaccess.*;
 import service.exception.UnauthorizedException;
 import model.AuthData;
-import service.requests.LogoutRequest;
-import service.responses.LogoutResponse;
+import requests.LogoutRequest;
+import responses.LogoutResponse;
 
 public class LogoutService {
     private MemoryDatabase memoryDatabase;

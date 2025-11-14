@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.exception.UnauthorizedException;
-import service.requests.ListGamesRequest;
-import service.responses.ListGamesResponse;
+import requests.ListGamesRequest;
+import responses.ListGamesResponse;
 
 public class ListGamesTests {
 

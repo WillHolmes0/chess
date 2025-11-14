@@ -1,4 +1,4 @@
-package service.requests;
+package requests;
 import model.UserData;
 
 public record RegisterRequest(String username, String password, String email) {}

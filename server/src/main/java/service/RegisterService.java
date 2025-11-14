@@ -5,8 +5,8 @@ import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
-import service.requests.RegisterRequest;
-import service.responses.RegisterResponse;
+import requests.RegisterRequest;
+import responses.RegisterResponse;
 
 public class RegisterService {
     private MemoryDatabase memoryDatabase;

@@ -7,8 +7,8 @@ import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import service.requests.JoinGameRequest;
-import service.responses.JoinGameResponse;
+import requests.JoinGameRequest;
+import responses.JoinGameResponse;
 
 public class JoinGameService {
     private MemoryDatabase memoryDatabase;

@@ -7,9 +7,9 @@ import service.exception.BadRequestException;
 import service.exception.MessageWrapper;
 import service.exception.UnauthorizedException;
 import io.javalin.http.Context;
-import service.requests.LoginRequest;
+import requests.LoginRequest;
 import service.LoginService;
-import service.responses.LoginResponse;
+import responses.LoginResponse;
 
 public class LoginHandler {
     private MemoryDatabase memoryDatabase;

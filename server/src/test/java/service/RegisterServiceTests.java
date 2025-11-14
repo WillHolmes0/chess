@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.exception.AlreadyTakenException;
-import service.requests.RegisterRequest;
-import service.responses.RegisterResponse;
+import requests.RegisterRequest;
+import responses.RegisterResponse;
 
 public class RegisterServiceTests {
     private MemoryDatabase memoryDatabase;

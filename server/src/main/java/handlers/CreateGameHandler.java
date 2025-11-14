@@ -6,8 +6,8 @@ import dataaccess.MemoryDatabase;
 import service.exception.BadRequestException;
 import service.exception.MessageWrapper;
 import service.exception.UnauthorizedException;
-import service.requests.CreateGameRequest;
-import service.responses.CreateGameResponse;
+import requests.CreateGameRequest;
+import responses.CreateGameResponse;
 import service.CreateGameService;
 import io.javalin.http.Context;
 

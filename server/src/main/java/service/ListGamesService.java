@@ -4,8 +4,8 @@ import dataaccess.*;
 import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import service.requests.ListGamesRequest;
-import service.responses.ListGamesResponse;
+import requests.ListGamesRequest;
+import responses.ListGamesResponse;
 
 import java.util.ArrayList;
 import java.util.Set;

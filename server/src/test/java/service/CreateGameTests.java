@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.exception.BadRequestException;
-import service.requests.CreateGameRequest;
-import service.responses.CreateGameResponse;
+import requests.CreateGameRequest;
+import responses.CreateGameResponse;
 
 public class CreateGameTests {
 

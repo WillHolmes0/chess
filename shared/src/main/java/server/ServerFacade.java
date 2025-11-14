@@ -1,7 +1,10 @@
 package server;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
+import requests.LogoutRequest;
+import requests.RegisterRequest;
+import responses.LoginResponse;
+import responses.RegisterResponse;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,11 +19,23 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public ChessGame createGame(ChessGame chessGame) {
-        var request = buildRequest("POST", "/game", chessGame);
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
-        return handleResponse(response, ChessGame.class);
+        return handleResponse(response, RegisterResponse.class);
     }
+
+    public LoginResponse login(LoginResponse loginRequest) {
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResponse.class);
+    }
+
+    public void logout(LogoutRequest logoutRequest) {
+        var request = buildRequest("DELETE", "/session", logoutRequest);
+        sendRequest(request);
+    }
+
 
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
@@ -48,15 +63,15 @@ public class ServerFacade {
         }
     }
 
-    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) {
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
-        if (!isSuccessful(status)) {
-            System.out.println("problem with response");
+        if (isSuccessful(status)) {
+            if (responseClass != null) {
+                return new Gson().fromJson(response.body(), responseClass);
+            }
+            return null;
         }
-        if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
-        }
-        return null;
+        throw new ResponseException(response.body());
     }
 
     private boolean isSuccessful(int status) {

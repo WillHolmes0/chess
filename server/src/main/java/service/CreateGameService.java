@@ -6,8 +6,8 @@ import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
-import service.requests.CreateGameRequest;
-import service.responses.CreateGameResponse;
+import requests.CreateGameRequest;
+import responses.CreateGameResponse;
 
 import java.util.Random;
 

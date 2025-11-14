@@ -6,8 +6,8 @@ import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import model.AuthData;
 import model.UserData;
-import service.requests.LoginRequest;
-import service.responses.LoginResponse;
+import requests.LoginRequest;
+import responses.LoginResponse;
 import service.exception.UnauthorizedException;
 
 public class LoginService {

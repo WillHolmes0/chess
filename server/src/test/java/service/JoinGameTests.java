@@ -9,9 +9,7 @@ import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import service.exception.AlreadyTakenException;
-import service.requests.JoinGameRequest;
-
-import javax.xml.crypto.Data;
+import requests.JoinGameRequest;
 
 public class JoinGameTests {
     private String authToken = "bypass";

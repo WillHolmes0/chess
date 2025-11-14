@@ -5,8 +5,8 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import service.exception.MessageWrapper;
 import service.exception.UnauthorizedException;
-import service.requests.ListGamesRequest;
-import service.responses.ListGamesResponse;
+import requests.ListGamesRequest;
+import responses.ListGamesResponse;
 import service.ListGamesService;
 import io.javalin.http.Context;
 

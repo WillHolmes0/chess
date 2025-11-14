@@ -5,8 +5,8 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import service.exception.MessageWrapper;
 import service.exception.UnauthorizedException;
-import service.requests.LogoutRequest;
-import service.responses.LogoutResponse;
+import requests.LogoutRequest;
+import responses.LogoutResponse;
 import service.LogoutService;
 import io.javalin.http.Context;
 

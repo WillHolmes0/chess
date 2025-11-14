@@ -7,8 +7,8 @@ import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import io.javalin.http.Context;
 import service.exception.MessageWrapper;
-import service.requests.RegisterRequest;
-import service.responses.RegisterResponse;
+import requests.RegisterRequest;
+import responses.RegisterResponse;
 import service.RegisterService;
 
 public class RegisterHandler {
