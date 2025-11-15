@@ -77,18 +77,23 @@ public class ServerFacadeTests {
     public void logoutTestSucess() {
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         Assertions.assertDoesNotThrow(() -> serverFacade.logout(logoutRequest));
-        //add a call to the server to show that you are not authenticated
+        CreateGameRequest createGameRequest = new CreateGameRequest("newGame", authToken);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest));
     }
 
     @Test
     public void createGameTestSuccess() {
         CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
         Assertions.assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest));
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResponse listGamesResponse = serverFacade.listGames(listGamesRequest);
+        Assertions.assertEquals(1, listGamesResponse.games().size());
+        Assertions.assertInstanceOf(GameData.class, listGamesResponse.games().get(0));
     }
 
     @Test
     public void createGameTestFailure() {
-        CreateGameRequest createGameRequest = new CreateGameRequest(null, authToken);
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", "invalid AuthToken");
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest));
     }
 
@@ -111,5 +116,7 @@ public class ServerFacadeTests {
         ListGamesRequest listGamesRequest = new ListGamesRequest("invalid auth token");
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.listGames(listGamesRequest));
     }
+
+
 
 }
