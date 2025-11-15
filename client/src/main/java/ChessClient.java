@@ -115,9 +115,13 @@ public class ChessClient {
     public String listGames() throws ResponseException {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResponse listGamesResponse = server.listGames(listGamesRequest);
-        String gameList = "\n\n";
+        String gameList = "\n";
+        int counter = 1;
+        if (listGamesResponse.games().size() == 0) {
+            return "\nNo games to list\n";
+        }
         for (GameData game : listGamesResponse.games()) {
-            String gameInfo = String.format("Game Name: %s\nGame ID: %s\n\n", game.gameName(), game.gameID());
+            String gameInfo = String.format("%d. Game Name: %s  Game ID; %s\n", counter, game.game(), game.gameID());
             gameList = gameList + gameInfo;
         }
         return gameList;
@@ -126,9 +130,10 @@ public class ChessClient {
     public String help() {
         if (authToken != null) {
            return """
-                    - createGame <gameName>
-                    - joinGame <playerColor> <gameID>
-                    - listGames
+                    - creategame <gameName>
+                    - joingame <playerColor>(white or black) <gameID>
+                    - listgames
+                    - observegame <gameID>
                     - logOut
                     - quit
                    """;
