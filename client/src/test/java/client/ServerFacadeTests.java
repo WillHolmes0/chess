@@ -1,5 +1,6 @@
 package client;
 
+import model.GameData;
 import org.junit.jupiter.api.*;
 import requests.*;
 import responses.ListGamesResponse;
@@ -8,6 +9,8 @@ import responses.RegisterResponse;
 import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
+
+import java.util.List;
 
 
 public class ServerFacadeTests {
@@ -95,7 +98,18 @@ public class ServerFacadeTests {
         serverFacade.createGame(createGameRequest);
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResponse listGamesResponse = serverFacade.listGames(listGamesRequest);
+        model.GameData game = listGamesResponse.games().get(0);
+        Assertions.assertEquals(1, listGamesResponse.games().size());
+        Assertions.assertInstanceOf(GameData.class, game);
+        Assertions.assertEquals("myGame", game.gameName());
+    }
 
+    @Test
+    public void listGamesFailure() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
+        serverFacade.createGame(createGameRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest("invalid auth token");
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.listGames(listGamesRequest));
     }
 
 }
