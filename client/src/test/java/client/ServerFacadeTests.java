@@ -3,9 +3,7 @@ package client;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import requests.*;
-import responses.ListGamesResponse;
-import responses.LoginResponse;
-import responses.RegisterResponse;
+import responses.*;
 import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
@@ -82,6 +80,13 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void logoutTestFailure() {
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        serverFacade.logout(logoutRequest);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.logout(logoutRequest));
+    }
+
+    @Test
     public void createGameTestSuccess() {
         CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
         Assertions.assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest));
@@ -117,6 +122,26 @@ public class ServerFacadeTests {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.listGames(listGamesRequest));
     }
 
+    @Test
+    public void joinGameSucess() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
+        CreateGameResponse createGameResponse = serverFacade.createGame(createGameRequest);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("white", createGameResponse.gameID(), authToken);
+        JoinGameResponse joinGameResponse = serverFacade.joinGame(joinGameRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResponse listGamesResponse = serverFacade.listGames(listGamesRequest);
+        GameData game = listGamesResponse.games().get(0);
+        Assertions.assertEquals("willy", game.whiteUsername());
+        Assertions.assertNull(game.blackUsername());
+    }
 
+    @Test
+    public void joinGameFailure() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
+        CreateGameResponse createGameResponse = serverFacade.createGame(createGameRequest);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("white", createGameResponse.gameID(), authToken);
+        serverFacade.joinGame(joinGameRequest);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame(joinGameRequest));
+    }
 
 }

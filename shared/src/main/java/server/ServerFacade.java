@@ -59,6 +59,13 @@ public class ServerFacade {
         return handleResponse(response, CreateGameResponse.class);
     }
 
+    public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
+        JoinGameRequest joinGameRequestBody = new JoinGameRequest(joinGameRequest.playerColor(), joinGameRequest.gameID(), null);
+        var request = buildRequest("PUT", "/game", joinGameRequestBody, joinGameRequest.authorization());
+        var response = sendRequest(request);
+        return handleResponse(response, JoinGameResponse.class);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {
         HttpRequest.BodyPublisher requestBody = (body != null) ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)) : HttpRequest.BodyPublishers.noBody();
         var request = HttpRequest.newBuilder()

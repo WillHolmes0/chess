@@ -17,7 +17,6 @@ public class LogoutService {
 //        MemoryAuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
         AuthDAO authDAO = new DatabaseAuthDAO();
         AuthData authData = authDAO.getAuthData(logoutRequest.authorization());
-        System.out.println(logoutRequest);
         if (authData != null) {
             authDAO.deleteAuthToken(logoutRequest.authorization());
             return new LogoutResponse();
