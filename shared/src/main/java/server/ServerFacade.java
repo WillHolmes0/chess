@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
 import responses.LoginResponse;
@@ -19,19 +20,30 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest) {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ResponseException {
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResponse.class);
     }
 
-    public LoginResponse login(LoginResponse loginRequest) {
+    public LoginResponse login(LoginRequest loginRequest) throws ResponseException {
         var request = buildRequest("POST", "/session", loginRequest);
         var response = sendRequest(request);
         return handleResponse(response, LoginResponse.class);
     }
 
-    public void logout(LogoutRequest logoutRequest) {
+    public void clearDatabase() {
+        var request = buildRequest("DELETE", "/db", null);
+        var response = sendRequest(request);
+        try {
+            handleResponse(response, null);
+            System.out.println("sucessfully cleared the database");
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void logout(LogoutRequest logoutRequest) throws ResponseException {
         var request = buildRequest("DELETE", "/session", logoutRequest);
         sendRequest(request);
     }
@@ -55,11 +67,11 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
-            return null;
+            throw new ResponseException(e.getMessage());
         }
     }
 

@@ -45,8 +45,8 @@ public class ChessClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register" -> register(params);
-                case "signin" -> signIn(params);
-                case "signout" -> signOut();
+                case "signin" -> logIn(params);
+                case "signout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -55,11 +55,12 @@ public class ChessClient {
         }
     }
 
-    public String signIn(String... params) {
+    public String logIn(String... params) {
         try {
             if (params.length == 2) {
-            LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
-            LoginResponse loginResponse = server.
+                LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
+                LoginResponse loginResponse = server.login(loginRequest);
+                return String.format("logged in as %s", loginResponse.username());
             }
             throw new ResponseException("Error: Invalid amount of arguments");
         } catch (ResponseException e) {
@@ -77,7 +78,7 @@ public class ChessClient {
             throw new ResponseException("Error: incorrect number of inputs supplied");
     }
 
-    public String signOut() {
+    public String logOut() {
         if (signedIn) {
             signedIn = false;
             String message = String.format("%s signed out of the game", playerName);
