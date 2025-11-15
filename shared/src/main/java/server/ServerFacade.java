@@ -5,6 +5,7 @@ import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
 import responses.LoginResponse;
+import responses.LogoutResponse;
 import responses.RegisterResponse;
 
 import java.net.URI;
@@ -44,27 +45,28 @@ public class ServerFacade {
     }
 
     public void logout(LogoutRequest logoutRequest) throws ResponseException {
-        var request = buildRequest("DELETE", "/session", logoutRequest);
-        sendRequest(request);
+        var request = buildRequest("DELETE", "/session", null, logoutRequest.authorization());
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, Object body, String auth) {
+        HttpRequest.BodyPublisher requestBody = (body != null) ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)) : HttpRequest.BodyPublishers.noBody();
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
-                .method(method, makeRequestBody(body));
+                .method(method, requestBody);
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (auth != null) {
+            request.setHeader("authorization", auth);
         }
         return request.build();
     }
 
-    private HttpRequest.BodyPublisher makeRequestBody(Object request) {
-        if (request != null) {
-            return HttpRequest.BodyPublishers.ofString(new Gson().toJson(request));
-        } else {
-            return HttpRequest.BodyPublishers.noBody();
-        }
+    private HttpRequest buildRequest(String method, String path, Object body) {
+        return buildRequest(method, path, body, null);
     }
 
     private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
@@ -77,7 +79,7 @@ public class ServerFacade {
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
-        if (isSuccessful(status)) {
+        if (status / 100 == 2) {
             if (responseClass != null) {
                 return new Gson().fromJson(response.body(), responseClass);
             }
@@ -85,8 +87,5 @@ public class ServerFacade {
         }
         throw new ResponseException(response.body());
     }
-
-    private boolean isSuccessful(int status) {
-        return status / 100 == 2;
-    }
 }
+
