@@ -1,12 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.RegisterRequest;
-import responses.LoginResponse;
-import responses.LogoutResponse;
-import responses.RegisterResponse;
+import requests.*;
+import responses.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -50,6 +46,18 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, listGamesRequest.authorization());
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResponse.class);
+    }
+
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws ResponseException {
+        CreateGameRequest createGameRequestBody = new CreateGameRequest(createGameRequest.gameName(), null);
+        var request = buildRequest("POST", "/game", createGameRequestBody, createGameRequest.authorization());
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResponse.class);
+    }
 
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {
         HttpRequest.BodyPublisher requestBody = (body != null) ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)) : HttpRequest.BodyPublishers.noBody();

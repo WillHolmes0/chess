@@ -1,9 +1,8 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.RegisterRequest;
+import requests.*;
+import responses.ListGamesResponse;
 import responses.LoginResponse;
 import responses.RegisterResponse;
 import server.ResponseException;
@@ -76,6 +75,27 @@ public class ServerFacadeTests {
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         Assertions.assertDoesNotThrow(() -> serverFacade.logout(logoutRequest));
         //add a call to the server to show that you are not authenticated
+    }
+
+    @Test
+    public void createGameTestSuccess() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
+        Assertions.assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest));
+    }
+
+    @Test
+    public void createGameTestFailure() {
+        CreateGameRequest createGameRequest = new CreateGameRequest(null, authToken);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest));
+    }
+
+    @Test
+    public void listGamesSuccess() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authToken);
+        serverFacade.createGame(createGameRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResponse listGamesResponse = serverFacade.listGames(listGamesRequest);
+
     }
 
 }
