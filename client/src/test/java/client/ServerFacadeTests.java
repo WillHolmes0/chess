@@ -144,4 +144,9 @@ public class ServerFacadeTests {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame(joinGameRequest));
     }
 
+    //This is not a real test. This should be commented out upon submission.
+    @Test
+    public void clearGameHack() {
+        serverFacade.clearDatabase();
+    }
 }
