@@ -1,16 +1,14 @@
-import jdk.javadoc.doclet.Reporter;
-import requests.LoginRequest;
-import requests.RegisterRequest;
-import responses.LoginResponse;
-import responses.RegisterResponse;
+import model.GameData;
+import requests.*;
+import responses.*;
 import server.ResponseException;
 import server.ServerFacade;
 
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class ChessClient {
-    private boolean signedIn = false;
     private String authToken = null;
     private String playerName;
     private ServerFacade server;
@@ -27,26 +25,32 @@ public class ChessClient {
         while (!result.equals("quit")) {
             String line = scanner.nextLine();
 
-            try {
-                result = eval(line);
-                if (!result.equals("quit")) {
-                    System.out.println(result);
-                }
-            } catch (Throwable e) {
-                System.out.println(e);
+            result = eval(line);
+            if (!result.equals("quit")) {
+                System.out.println(result);
             }
         }
     }
+
 
     private String eval(String input) {
         try {
             String[] tokens = input.toLowerCase().strip().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            if (authToken == null) {
+                return switch (cmd) {
+                    case "register" -> register(params);
+                    case "login" -> login(params);
+                    case "quit" -> "quit";
+                    default -> help();
+                };
+            }
             return switch (cmd) {
-                case "register" -> register(params);
-                case "signin" -> logIn(params);
-                case "signout" -> logOut();
+                case "joingame" -> joinGame(params);
+                case "listgames" -> listGames();
+                case "creategame" -> createGame(params);
+                case "logout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -55,11 +59,13 @@ public class ChessClient {
         }
     }
 
-    public String logIn(String... params) {
+
+    public String login(String... params) {
         try {
             if (params.length == 2) {
                 LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
                 LoginResponse loginResponse = server.login(loginRequest);
+                authToken = loginResponse.authToken();
                 return String.format("logged in as %s", loginResponse.username());
             }
             throw new ResponseException("Error: Invalid amount of arguments");
@@ -78,28 +84,58 @@ public class ChessClient {
             throw new ResponseException("Error: incorrect number of inputs supplied");
     }
 
-    public String logOut() {
-        if (signedIn) {
-            signedIn = false;
-            String message = String.format("%s signed out of the game", playerName);
-            playerName = null;
-            return message;
-        }
-        return null;
+    public String logOut() throws ResponseException {
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        server.logout(logoutRequest);
+        authToken = null;
+        return String.format("successfully logged out");
     }
 
+    public String createGame(String... params) {
+        if (params.length == 1) {
+            CreateGameRequest createGameRequest = new CreateGameRequest(params[0], authToken);
+            CreateGameResponse createGameResponse = server.createGame(createGameRequest);
+            return String.format("created game: %s. Game ID is %d", createGameRequest.gameName(), createGameResponse.gameID());
+        } else {
+            throw new ResponseException("Error: incorrect number of inputs supplied");
+        }
+    }
+
+    public String joinGame(String... params) throws ResponseException {
+        if (params.length == 2) {
+            String color = params[0].toLowerCase().strip();
+            int gameID = Integer.parseInt(params[1]);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
+            JoinGameResponse joinGameResponse = server.joinGame(joinGameRequest);
+            return String.format("Joined game no. %s, as %s player", gameID, color);
+        }
+        throw new ResponseException("Error: incorrect number of inputs supplied");
+    }
+
+    public String listGames() throws ResponseException {
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResponse listGamesResponse = server.listGames(listGamesRequest);
+        String gameList = "\n\n";
+        for (GameData game : listGamesResponse.games()) {
+            String gameInfo = String.format("Game Name: %s\nGame ID: %s\n\n", game.gameName(), game.gameID());
+            gameList = gameList + gameInfo;
+        }
+        return gameList;
+    }
 
     public String help() {
-        if (signedIn) {
+        if (authToken != null) {
            return """
-                    - createGame
-                    - signOut
+                    - createGame <gameName>
+                    - joinGame <playerColor> <gameID>
+                    - listGames
+                    - logOut
                     - quit
                    """;
         }
         return """
                 - register <username> <password> <email>
-                - signIn <username> <password>
+                - logIn <username> <password>
                 - quit
                """;
     }

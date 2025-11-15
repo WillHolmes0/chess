@@ -84,7 +84,7 @@ public class ServerFacade {
         return buildRequest(method, path, body, null);
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
+    private HttpResponse<String> sendRequest(HttpRequest request) {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
