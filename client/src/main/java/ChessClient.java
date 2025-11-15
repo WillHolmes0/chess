@@ -1,8 +1,13 @@
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import requests.*;
 import responses.*;
 import server.ResponseException;
 import server.ServerFacade;
+import ui.EscapeSequences;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -19,6 +24,13 @@ public class ChessClient {
 
     public void run() {
         System.out.println("Welcome to the ChessServer");
+
+        // testing sequence
+//        login("willh", "passy");
+//        ChessGame game = selectGame("3966");
+//        drawGameBoard(game);
+
+        // end testing sequence
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -50,6 +62,7 @@ public class ChessClient {
                 case "joingame" -> joinGame(params);
                 case "listgames" -> listGames();
                 case "creategame" -> createGame(params);
+                case "observegame" -> observeGame(params);
                 case "logout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
@@ -121,10 +134,25 @@ public class ChessClient {
             return "\nNo games to list\n";
         }
         for (GameData game : listGamesResponse.games()) {
-            String gameInfo = String.format("%d. Game Name: %s  Game ID; %s\n", counter, game.game(), game.gameID());
+            String whitePlayer = (game.whiteUsername() != null) ? game.whiteUsername() : "No Player";
+            String blackPlayer = (game.blackUsername() != null) ? game.blackUsername() : "No PLayer";
+            String gameInfo = String.format("%d. GameName: %s  GameID; %s  WhitePlayer: %s  BlackPlayer: %s\n", counter, game.game(), game.gameID(), whitePlayer, blackPlayer);
             gameList = gameList + gameInfo;
         }
         return gameList;
+    }
+
+    public String observeGame(String... params) throws ResponseException {
+        if (params.length != 1) {
+            throw new ResponseException("Error: incorrect number of inputs supplied");
+        }
+        String gameID = params[0];
+        ChessGame chessGame = selectGame(gameID);
+        if (chessGame == null) {
+            throw new ResponseException("Error: invalid gameID");
+        }
+        ChessGame game = selectGame("3966");
+        return "\n" + drawGameBoard(game) + EscapeSequences.SET_BG_COLOR_DARK_GREY + "\n";
     }
 
     public String help() {
@@ -134,16 +162,69 @@ public class ChessClient {
                     - joingame <playerColor>(white or black) <gameID>
                     - listgames
                     - observegame <gameID>
-                    - logOut
+                    - logout
                     - quit
                    """;
         }
         return """
                 - register <username> <password> <email>
-                - logIn <username> <password>
+                - login <username> <password>
                 - quit
                """;
     }
 
+    private ChessGame selectGame(String gameID) {
+        GameData game;
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResponse listGamesResponse = server.listGames(listGamesRequest);
+        for (GameData gameOption : listGamesResponse.games()) {
+            if (gameID.equals(String.valueOf(gameOption.gameID()))) {
+                return gameOption.game();
+            }
+        }
+        return null;
+    }
+
+    private String drawGameBoard(ChessGame chessGame) {
+        ChessBoard chessBoard = chessGame.getBoard();
+        String chessBoardString = "";
+        int square = 0;
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                if (square % 2 == 0) {
+                    chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                } else {
+                    chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }
+                ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
+                chessBoardString += getPieceString(chessPiece);
+                square++;
+            }
+            square--;
+            chessBoardString += (EscapeSequences.SET_BG_COLOR_BLACK + "\n");
+        }
+        return chessBoardString;
+    }
+
+    private String getPieceString(ChessPiece piece) {
+        if (piece == null) {
+            return EscapeSequences.EMPTY;
+        }
+        String chessPieceString = "";
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            chessPieceString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } else {
+            chessPieceString += EscapeSequences.SET_TEXT_COLOR_BLACK;
+        }
+        chessPieceString += switch (piece.getPieceType()) {
+            case ChessPiece.PieceType.ROOK -> EscapeSequences.BLACK_ROOK;
+            case ChessPiece.PieceType.KNIGHT -> EscapeSequences.BLACK_KNIGHT;
+            case ChessPiece.PieceType.BISHOP -> EscapeSequences.BLACK_BISHOP;
+            case ChessPiece.PieceType.KING -> EscapeSequences.BLACK_KING;
+            case ChessPiece.PieceType.PAWN -> EscapeSequences.BLACK_PAWN;
+            case ChessPiece.PieceType.QUEEN -> EscapeSequences.BLACK_QUEEN;
+        };
+        return chessPieceString;
+    }
 
 }
