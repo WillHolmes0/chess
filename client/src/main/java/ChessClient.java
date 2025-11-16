@@ -27,6 +27,13 @@ public class ChessClient {
     public void run() {
         System.out.println("Welcome to the ChessServer");
 
+        //chessboard display for testing
+        login("willh", "passy");
+        listGames();
+        String observableGame = observeGame("9764");
+        System.out.print(observableGame);
+        //end testing code
+
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
@@ -149,7 +156,7 @@ public class ChessClient {
         if (chessGame == null) {
             throw new ResponseException("Could not find game. Either the game ID is invalid, or you need to run listgames to load the games.");
         }
-        return "\n" + drawGameBoard(chessGame) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
+        return "\n" + drawGameBoard(chessGame, ChessGame.TeamColor.BLACK) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
     }
 
     public String help() {
@@ -177,23 +184,86 @@ public class ChessClient {
         return null;
     }
 
-    private String drawGameBoard(ChessGame chessGame) {
+    private String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective) {
         ChessBoard chessBoard = chessGame.getBoard();
         String chessBoardString = "";
         int square = 0;
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                if (square % 2 == 0) {
-                    chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                } else {
-                    chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        if (perspective == ChessGame.TeamColor.WHITE) {
+            for (int i = 9; i >= 0; i--) {
+                for (int j = 0; j <= 9; j++) {
+                    if (j == 0) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        if (i == 9 || i == 0) {
+                            chessBoardString += "   ";
+                        } else {
+                            chessBoardString += "  " + String.valueOf(i) + " ";
+                        }
+                    } else if (j == 9) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        if (i == 9 || i == 0) {
+                            chessBoardString += "  ";
+                        } else {
+                            chessBoardString += "  " + String.valueOf(i) + " ";
+                        }
+                    } else if (i == 9 || i == 0) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        int asciiCode = 0x40 + j;
+                        chessBoardString += String.format(" %c  ", asciiCode);
+                    } else {
+                        if (square % 2 == 1) {
+                            chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                        } else {
+                            chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                        }
+                        ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
+                        chessBoardString += getPieceString(chessPiece);
+                    }
+                    square++;
                 }
-                ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
-                chessBoardString += getPieceString(chessPiece);
                 square++;
+                chessBoardString += (EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.RESET_BG_COLOR + "\n");
             }
-            square--;
-            chessBoardString += (EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.RESET_BG_COLOR + "\n");
+        } else {
+            for (int i = 0; i <= 9; i++) {
+                for (int j = 9; j >= 0; j--) {
+                    if (j == 0) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        if (i == 9 || i == 0) {
+                            chessBoardString += "  ";
+                        } else {
+                            chessBoardString += "  " + String.valueOf(i) + " ";
+                        }
+                    } else if (j == 9) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        if (i == 9 || i == 0) {
+                            chessBoardString += "   ";
+                        } else {
+                            chessBoardString += "  " + String.valueOf(i) + " ";
+                        }
+                    } else if (i == 9 || i == 0) {
+                        chessBoardString += EscapeSequences.SET_BG_COLOR_BLACK;
+                        chessBoardString += EscapeSequences.SET_TEXT_COLOR_WHITE;
+                        int asciiCode = 0x40 + j;
+                        chessBoardString += String.format(" %c  ", asciiCode);
+                    } else {
+                        if (square % 2 == 1) {
+                            chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                        } else {
+                            chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                        }
+                        ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
+                        chessBoardString += getPieceString(chessPiece);
+                    }
+                    square++;
+                }
+                square++;
+                chessBoardString += (EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.RESET_BG_COLOR + "\n");
+            }
         }
         return chessBoardString;
     }
