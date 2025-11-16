@@ -145,8 +145,8 @@ public class ServerFacadeTests {
     }
 
     //This is not a real test. This should be commented out upon submission.
-    @Test
-    public void clearGameHack() {
-        serverFacade.clearDatabase();
-    }
+//    @Test
+//    public void clearGameHack() {
+//        serverFacade.clearDatabase();
+//    }
 }

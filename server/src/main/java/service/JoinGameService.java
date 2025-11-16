@@ -34,12 +34,12 @@ public class JoinGameService {
             if (prospectiveGameData == null) {
                 throw new BadRequestException("Error: invalid gameID");
             }
-            if (joinGameRequest.playerColor().equals("white")) {
+            if (joinGameRequest.playerColor().toUpperCase().equals("WHITE")) {
                 playerColor = ChessGame.TeamColor.WHITE;
                 if (prospectiveGameData.whiteUsername() != null) {
                     throw new AlreadyTakenException("Error: color already taken");
                 }
-            } else if (joinGameRequest.playerColor().equals("black")) {
+            } else if (joinGameRequest.playerColor().toUpperCase().equals("BLACK")) {
                 playerColor = ChessGame.TeamColor.BLACK;
                 if (prospectiveGameData.blackUsername() != null) {
                     throw new AlreadyTakenException("Error: color already taken");
