@@ -28,10 +28,10 @@ public class ChessClient {
         System.out.println("Welcome to the ChessServer");
 
         //chessboard display for testing
-        login("willh", "passy");
-        listGames();
-        String observableGame = observeGame("9764");
-        System.out.print(observableGame);
+        //login("will", "passy");
+//        listGames();
+//        String observableGame = observeGame("9764");
+//        System.out.print(observableGame);
         //end testing code
 
         Scanner scanner = new Scanner(System.in);
@@ -156,7 +156,7 @@ public class ChessClient {
         if (chessGame == null) {
             throw new ResponseException("Could not find game. Either the game ID is invalid, or you need to run listgames to load the games.");
         }
-        return "\n" + drawGameBoard(chessGame, ChessGame.TeamColor.BLACK) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
+        return "\n" + drawGameBoard(chessGame, ChessGame.TeamColor.WHITE) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
     }
 
     public String help() {

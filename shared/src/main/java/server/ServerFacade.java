@@ -100,7 +100,9 @@ public class ServerFacade {
             }
             return null;
         }
-        throw new ResponseException(response.body());
+        ExceptionMessage message = new Gson().fromJson(response.body(), ExceptionMessage.class);
+        throw new ResponseException(message.message());
+
     }
 }
 
