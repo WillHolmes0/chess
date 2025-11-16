@@ -37,7 +37,7 @@ public class ChessClient {
         var input = "";
         while (!input.equals("quit")) {
             System.out.print("\n>>> ");
-            input = scanner.nextLine();
+            input = scanner.nextLine().strip().toLowerCase();
 
             System.out.println(eval(input));
         }
@@ -46,7 +46,7 @@ public class ChessClient {
 
     private String eval(String input) {
         try {
-            String[] tokens = input.toLowerCase().strip().split(" ");
+            String[] tokens = input.split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             if (authToken == null) {
@@ -63,7 +63,7 @@ public class ChessClient {
                 case "creategame" -> createGame(params);
                 case "observegame" -> observeGame(params);
                 case "logout" -> logOut();
-                case "quit" -> "quit";
+                case "quit" -> "exiting the chess app";
                 default -> help();
             };
         } catch (ResponseException e) {
@@ -91,7 +91,7 @@ public class ChessClient {
                 RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
                 RegisterResponse registerResponse = server.register(registerRequest);
                 authToken = registerResponse.authToken();
-                return String.format("registered as %s", registerResponse.username());
+                return String.format("registered and logged in as %s", registerResponse.username());
             }
             throw new ResponseException("Incorrect number of inputs supplied");
     }
