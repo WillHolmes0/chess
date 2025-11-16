@@ -39,7 +39,6 @@ public class CreateGameService {
     public int generateGameId() {
         Random randomGenerator = new Random();
         int gameId = randomGenerator.nextInt(1, 10000);
-        System.out.println(gameId);
         MemoryGameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         if (gameDAO.getGame(gameId) == null) {
             return gameId;

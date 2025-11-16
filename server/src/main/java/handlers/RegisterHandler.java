@@ -30,7 +30,6 @@ public class RegisterHandler {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
         } catch (AlreadyTakenException e) {
-            System.out.println(e.messageWrapper());
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));
         } catch (DataAccessException e) {

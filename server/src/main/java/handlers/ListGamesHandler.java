@@ -23,7 +23,6 @@ public class ListGamesHandler {
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(ctx.header("authorization"));
             ListGamesResponse listGamesResponse = listGamesService.listGames(listGamesRequest);
-            System.out.println(listGamesResponse);
             ctx.status(200);
             ctx.result(new Gson().toJson(listGamesResponse));
         } catch (UnauthorizedException e) {
