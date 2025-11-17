@@ -9,15 +9,13 @@ import server.ResponseException;
 import server.ServerFacade;
 import ui.EscapeSequences;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class ChessClient {
     private String authToken = null;
     private String playerName;
     private ServerFacade server;
-    private ArrayList<GameData> gameList = new ArrayList<>();
+    private Map<String, GameData> gameList = new HashMap<>();
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -106,9 +104,9 @@ public class ChessClient {
     public String createGame(String... params) {
         if (params.length == 1) {
             CreateGameRequest createGameRequest = new CreateGameRequest(params[0], authToken);
-            CreateGameResponse createGameResponse = server.createGame(createGameRequest);
+            server.createGame(createGameRequest);
             updateGameList();
-            return String.format("created game: %s  GameID is %d", createGameRequest.gameName(), createGameResponse.gameID());
+            return String.format("created game: %s", createGameRequest.gameName());
         } else {
             throw new ResponseException("Incorrect number of inputs supplied");
         }
@@ -117,11 +115,17 @@ public class ChessClient {
     public String joinGame(String... params) throws ResponseException {
         if (params.length == 2) {
             String color = params[0].toLowerCase().strip();
-            int gameID = Integer.parseInt(params[1]);
+            String gameKey = params[1];
+//            try {
+//                gameKey = Integer.parseInt(params[1]);
+//            } catch (NumberFormatException e) {
+//                throw new ResponseException("Error: input for gameID is not valid");
+//            }
+            int gameID = selectGame(String.valueOf(gameKey)).gameID();
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
             server.joinGame(joinGameRequest);
             updateGameList();
-            return String.format("Joined game no. %s, as %s player\n", gameID, color) + observeGame(String.valueOf(gameID), color);
+            return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }
         throw new ResponseException("Incorrect number of inputs supplied");
     }
@@ -130,14 +134,14 @@ public class ChessClient {
         updateGameList();
 
         String gameListString = "";
-        int counter = 1;
         if (gameList.size() == 0) {
             return "\nNo games to list";
         }
-        for (GameData game : gameList) {
+        for (String gameKey : gameList.keySet()) {
+            GameData game = gameList.get(gameKey);
             String whitePlayer = (game.whiteUsername() != null) ? game.whiteUsername() : "No Player";
             String blackPlayer = (game.blackUsername() != null) ? game.blackUsername() : "No PLayer";
-            String gameInfo = String.format("\n%d. GameName: %s  GameID; %s  WhitePlayer: %s  BlackPlayer: %s", counter, game.gameName(), game.gameID(), whitePlayer, blackPlayer);
+            String gameInfo = String.format("\nGameNumber: %s GameName: %s  WhitePlayer: %s  BlackPlayer: %s", gameKey, game.gameName(), whitePlayer, blackPlayer);
             gameListString = gameListString + gameInfo;
         }
         return gameListString;
@@ -161,10 +165,7 @@ public class ChessClient {
             teamColor = ChessGame.TeamColor.WHITE;
         }
         String gameID = params[0];
-        ChessGame chessGame = selectGame(gameID);
-        if (chessGame == null) {
-            throw new ResponseException("Could not find game. Either the game ID is invalid, or you need to run listgames to load the games.");
-        }
+        ChessGame chessGame = selectGame(gameID).game();
         return "\n" + drawGameBoard(chessGame, teamColor) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
     }
 
@@ -176,21 +177,22 @@ public class ChessClient {
                     - listgames
                     - observegame <gameID>
                     - logout
-                    - quit""";
+                    - quit
+                    - help (displays possible actions for the user)""";
         }
         return """
                 - register <username> <password> <email>
                 - login <username> <password>
-                - quit""";
+                - quit
+                - help (displays possible actions for the user)""";
     }
 
-    private ChessGame selectGame(String gameID) {
-        for (GameData gameOption : gameList) {
-            if (gameID.equals(String.valueOf(gameOption.gameID()))) {
-                return gameOption.game();
-            }
+    private GameData selectGame(String gameNumber) {
+        GameData gameData = gameList.get(gameNumber);
+        if (gameData == null) {
+            throw new ResponseException("Could not find game. Either the game number is invalid, or you need to run listgames to load the games.");
         }
-        return null;
+        return gameData;
     }
 
     private String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective) {
@@ -301,6 +303,10 @@ public class ChessClient {
     private void updateGameList() {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResponse listGamesResponse = server.listGames(listGamesRequest);
-        gameList = listGamesResponse.games();
+        int gameNumberCounter = 1;
+        for (GameData game : listGamesResponse.games()) {
+            gameList.put(String.valueOf(gameNumberCounter), game);
+            gameNumberCounter++;
+        }
     }
 }
