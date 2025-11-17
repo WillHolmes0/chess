@@ -57,10 +57,10 @@ public class ChessClient {
             }
             return switch (cmd) {
                 case "joingame" -> joinGame(params);
-                case "listgames" -> listGames();
+                case "listgames" -> listGames(params);
                 case "creategame" -> createGame(params);
                 case "observegame" -> observeGame(params);
-                case "logout" -> logOut();
+                case "logout" -> logOut(params);
                 case "quit" -> "exiting the chess app";
                 default -> help();
             };
@@ -94,7 +94,10 @@ public class ChessClient {
             throw new ResponseException("Incorrect number of inputs supplied");
     }
 
-    public String logOut() throws ResponseException {
+    public String logOut(String... params) throws ResponseException {
+        if (params.length != 0) {
+            throw new ResponseException("Incorrect number of inputs supplied");
+        }
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         server.logout(logoutRequest);
         authToken = null;
@@ -130,7 +133,11 @@ public class ChessClient {
         throw new ResponseException("Incorrect number of inputs supplied");
     }
 
-    public String listGames() throws ResponseException {
+    public String listGames(String... params) throws ResponseException {
+        if (params.length != 0) {
+            throw new ResponseException("Incorrect number of inputs supplied");
+        }
+
         updateGameList();
 
         String gameListString = "";
