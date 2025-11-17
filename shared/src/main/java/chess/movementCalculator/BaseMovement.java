@@ -1,7 +1,5 @@
-package chess.MovementCalculator;
+package chess.movementCalculator;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessGame.TeamColor;

@@ -34,7 +34,7 @@ public class ListGamesTests {
     }
 
     @Test
-    public void ListMultipleGamesSucessful() {
+    public void listMultipleGamesSucessful() {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesService listGamesService = new ListGamesService(memoryDatabase);
         try {
@@ -48,7 +48,7 @@ public class ListGamesTests {
 
 
     @Test
-    public void ListGamesFailure() {
+    public void listGamesFailure() {
         ListGamesRequest listGamesRequest = new ListGamesRequest("invalidtoken");
         ListGamesService listGamesService = new ListGamesService(memoryDatabase);
         Assertions.assertThrows(UnauthorizedException.class, () -> listGamesService.listGames(listGamesRequest));

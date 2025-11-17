@@ -26,7 +26,7 @@ public class LoginServiceTests {
     }
 
     @Test
-    public void LoginSucess() {
+    public void loginSucess() {
         LoginRequest loginRequest = new LoginRequest("user1", "user1password");
         LoginService loginService = new LoginService(memoryDatabase);
         try {
@@ -37,7 +37,7 @@ public class LoginServiceTests {
     }
 
     @Test
-    public void LoginBadPasswordFailure() {
+    public void loginBadPasswordFailure() {
         LoginRequest loginRequest = new LoginRequest("user2", "user1password");
         LoginService loginService = new LoginService(memoryDatabase);
         Assertions.assertThrows(UnauthorizedException.class, () -> loginService.loginUser(loginRequest));
