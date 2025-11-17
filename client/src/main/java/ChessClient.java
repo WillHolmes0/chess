@@ -137,7 +137,7 @@ public class ChessClient {
         for (GameData game : gameList) {
             String whitePlayer = (game.whiteUsername() != null) ? game.whiteUsername() : "No Player";
             String blackPlayer = (game.blackUsername() != null) ? game.blackUsername() : "No PLayer";
-            String gameInfo = String.format("\n%d. GameName: %s  GameID; %s  WhitePlayer: %s  BlackPlayer: %s", counter, game.game(), game.gameID(), whitePlayer, blackPlayer);
+            String gameInfo = String.format("\n%d. GameName: %s  GameID; %s  WhitePlayer: %s  BlackPlayer: %s", counter, game.gameName(), game.gameID(), whitePlayer, blackPlayer);
             gameListString = gameListString + gameInfo;
         }
         return gameListString;
