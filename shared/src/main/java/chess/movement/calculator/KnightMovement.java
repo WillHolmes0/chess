@@ -1,4 +1,4 @@
-package chess.movementCalculator;
+package chess.movement.calculator;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -7,23 +7,23 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessMove;
 
-public class KingMovement extends BaseMovement{
+public class KnightMovement extends BaseMovement{
 
     private ChessBoard board;
     private ChessPosition startingPosition;
     private ChessPiece piece;
     private Collection<ChessMove> moves;
     private BaseMovement.Direction[] options = {
-            Direction.UP,
-            Direction.DOWN,
-            Direction.LEFT,
-            Direction.RIGHT,
-            Direction.UPLEFT,
-            Direction.UPRIGHT,
-            Direction.DOWNRIGHT,
-            Direction.DOWNLEFT};
+            Direction.KNIGHTDOWNLEFT,
+            Direction.KNIGHTDOWNRIGHT,
+            Direction.KNIGHTUPLEFT,
+            Direction.KNIGHTUPRIGHT,
+            Direction.KNIGHTLEFTUP,
+            Direction.KNIGHTLEFTDOWN,
+            Direction.KNIGHTRIGHTDOWN,
+            Direction.KNIGHTRIGHTUP};
 
-    public KingMovement(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
+    public KnightMovement(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
         super(board, piece);
         this.board = board;
         this.piece = piece;

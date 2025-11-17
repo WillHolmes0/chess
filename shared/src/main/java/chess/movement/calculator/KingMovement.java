@@ -1,4 +1,4 @@
-package chess.movementCalculator;
+package chess.movement.calculator;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -7,19 +7,23 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessMove;
 
-public class BishopMovement extends BaseMovement{
+public class KingMovement extends BaseMovement{
 
     private ChessBoard board;
     private ChessPosition startingPosition;
     private ChessPiece piece;
     private Collection<ChessMove> moves;
     private BaseMovement.Direction[] options = {
+            Direction.UP,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
             Direction.UPLEFT,
             Direction.UPRIGHT,
             Direction.DOWNRIGHT,
             Direction.DOWNLEFT};
 
-    public BishopMovement(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
+    public KingMovement(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
         super(board, piece);
         this.board = board;
         this.piece = piece;
@@ -29,24 +33,16 @@ public class BishopMovement extends BaseMovement{
 
     public void findMoves() {
         for (int i = 0; i < options.length; i++) {
-            boolean clear = true;
-            ChessPosition currentPosition = startingPosition;
-            while (clear) {
-                ChessPosition potentialPosition = getNewSpace(currentPosition, options[i]);
-                if (isInBounds(potentialPosition)) {
-                    if (!isSpaceOccupied(potentialPosition)) {
+            ChessPosition potentialPosition = getNewSpace(startingPosition, options[i]);
+            if (isInBounds(potentialPosition)) {
+                if (!isSpaceOccupied(potentialPosition)) {
+                    ChessMove newMove = new ChessMove(startingPosition, potentialPosition, null);
+                    moves.add(newMove);
+                } else {
+                    if (isOpposingPiece(potentialPosition, piece.getTeamColor())) {
                         ChessMove newMove = new ChessMove(startingPosition, potentialPosition, null);
                         moves.add(newMove);
-                        currentPosition = potentialPosition;
-                    } else {
-                        clear = false;
-                        if (isOpposingPiece(potentialPosition, piece.getTeamColor())) {
-                            ChessMove newMove = new ChessMove(startingPosition, potentialPosition, null);
-                            moves.add(newMove);
-                        }
                     }
-                } else {
-                    clear = false;
                 }
             }
         }
