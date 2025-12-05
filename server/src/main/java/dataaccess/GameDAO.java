@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import javax.xml.crypto.Data;
 import java.util.Set;
 
 public interface GameDAO {
@@ -16,4 +17,6 @@ public interface GameDAO {
     void clearDatabase() throws DataAccessException;
 
     Set<String> getGameKeys() throws DataAccessException;
+
+    void updateGame(GameData gameData) throws DataAccessException;
 }

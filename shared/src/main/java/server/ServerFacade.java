@@ -73,6 +73,13 @@ public class ServerFacade {
         return handleResponse(response, RemovePlayerResponse.class);
     }
 
+    public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws ResponseException {
+        UpdateGameRequest updateGameRequestbody = new UpdateGameRequest(updateGameRequest.gameData(), null);
+        var request = buildRequest("PUT", "/game/gamestate", updateGameRequestbody, updateGameRequest.authorization());
+        var response = sendRequest(request);
+        return handleResponse(response, UpdateGameResponse.class);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {
         HttpRequest.BodyPublisher requestBody = (body != null) ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)) : HttpRequest.BodyPublishers.noBody();
         var request = HttpRequest.newBuilder()

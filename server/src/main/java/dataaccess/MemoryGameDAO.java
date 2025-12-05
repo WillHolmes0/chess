@@ -43,4 +43,9 @@ public class MemoryGameDAO implements GameDAO {
     public void clearDatabase() {
         memoryDatabase.games().clear();
     }
+
+    @Override
+    public void updateGame(GameData gameData) {
+        //Not implemented
+    }
 }

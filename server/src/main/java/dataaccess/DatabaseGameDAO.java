@@ -19,6 +19,25 @@ public class DatabaseGameDAO implements GameDAO {
         createTableIfNonexistant();
     }
 
+    public void updateGame(GameData gameData) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement =
+                """
+                UPDATE games
+                SET game=?
+                WHERE gameID=?
+                """;
+            try (PreparedStatement ps = conn.prepareStatement((statement))) {
+                String serializedGame = new Gson().toJson(gameData.game());
+                ps.setString(1, serializedGame);
+                ps.setInt(2, gameData.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: could not update Chessgame");
+        }
+    }
+
     @Override
     public void createGame(GameData gameData) throws DataAccessException {
         createTableIfNonexistant();
