@@ -1,7 +1,9 @@
 package websocket;
 
+import com.google.gson.Gson;
 import jakarta.websocket.*;
 import server.ResponseException;
+import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,6 +23,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+
                     System.out.println(message);
                 }
             });
@@ -33,7 +36,8 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void connect() {
-
+    public void leave(int gameID, String authentication) {
+        UserGameCommand userGameCommand = new UserGameCommand((UserGameCommand.CommandType.LEAVE), authentication, gameID);
+        session.getAsyncRemote().sendText(new Gson().toJson(userGameCommand));
     }
 }

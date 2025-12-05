@@ -26,8 +26,10 @@ public class ChessClient extends UiBase {
         System.out.println("Welcome to the ChessServer");
 
         //chessboard display for testing
-        login("willh", "passy");
-        listGames();
+        System.out.println(login("r", "t"));
+        System.out.println(listGames());
+//        System.out.println(leaveGame("1"));
+        System.out.println(joinGame("black", "1"));
 //        String observableGame = observeGame("9764");
 //        System.out.print(observableGame);
         //end testing code
@@ -235,7 +237,7 @@ public class ChessClient extends UiBase {
     }
 
     private void enterGame() {
-        GameplayUi gameplayUi = new GameplayUi(serverUrl, currentChessGameID, currentChessPerspective);
+        GameplayUi gameplayUi = new GameplayUi(serverUrl, server, currentChessGameID, currentChessPerspective, authToken);
         gameplayUi.open();
     }
 

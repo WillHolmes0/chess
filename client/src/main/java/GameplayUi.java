@@ -1,4 +1,5 @@
 import chess.ChessGame;
+import server.ServerFacade;
 import websocket.WebSocketFacade;
 
 import java.util.Arrays;
@@ -8,11 +9,13 @@ public class GameplayUi extends UiBase {
     private int chessGameID;
     private WebSocketFacade webSocketFacade;
     private ChessGame.TeamColor color;
+    private String authentication;
 
-    public GameplayUi(String serverUrl, int chessGameID, ChessGame.TeamColor color) {
+    public GameplayUi(String serverUrl, ServerFacade serverFacade, int chessGameID, ChessGame.TeamColor color, String authentication) {
         this.chessGameID = chessGameID;
         this.color = color;
         webSocketFacade = new WebSocketFacade(serverUrl);
+        this.authentication = authentication;
     }
 
     public void open() {
@@ -38,7 +41,8 @@ public class GameplayUi extends UiBase {
     }
 
     private String leave() {
-        return "leaving the game";
+        webSocketFacade.leave(chessGameID, authentication);
+        return "left game on ui";
     }
 
 
