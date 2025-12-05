@@ -3,6 +3,8 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
+import requests.RemovePlayerRequest;
+import responses.RemovePlayerResponse;
 import service.RemovePlayerService;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
@@ -13,22 +15,22 @@ import requests.JoinGameRequest;
 import responses.JoinGameResponse;
 import service.JoinGameService;
 
-public class JoinGameHandler {
+public class RemovePlayerHandler {
     private MemoryDatabase memoryDatabase;
-    private JoinGameService joinGameService;
+    private RemovePlayerService removePlayerService;
 
-    public JoinGameHandler(MemoryDatabase memoryDatabase) {
+    public RemovePlayerHandler(MemoryDatabase memoryDatabase) {
         this.memoryDatabase = memoryDatabase;
-        this.joinGameService = new JoinGameService(memoryDatabase);
+        this.removePlayerService = new RemovePlayerService(memoryDatabase);
     }
 
     public void handle(Context ctx) {
-        JoinGameRequest joinGameRequestBody = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
-        JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameRequestBody.playerColor(), joinGameRequestBody.gameID(), ctx.header("authorization"));
+        RemovePlayerRequest removePlayerRequestBody = new Gson().fromJson(ctx.body(), RemovePlayerRequest.class);
+        RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(removePlayerRequestBody.gameID(), ctx.header("authorization"));
         try {
-            JoinGameResponse joinGameResponse = joinGameService.joinGame(joinGameRequest);
+            RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
             ctx.status(200);
-            ctx.result(new Gson().toJson(joinGameResponse));
+            ctx.result(new Gson().toJson(removePlayerResponse));
         } catch (UnauthorizedException e) {
             ctx.status(e.getCode());
             ctx.result(new Gson().toJson(e.messageWrapper()));

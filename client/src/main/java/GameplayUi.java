@@ -1,10 +1,19 @@
+import chess.ChessGame;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class GameplayUi extends UiBase {
+    private ChessGame chessGame;
+    private ChessGame.TeamColor color;
 
-    public GameplayUi() {
-
+    public GameplayUi(ChessGame chessGame) {
+        this.chessGame = chessGame;
+        if (color.equals("white")) {
+            this.color = ChessGame.TeamColor.WHITE;
+        } else {
+            this.color = ChessGame.TeamColor.BLACK;
+        }
     }
 
     public void open() {
@@ -13,9 +22,9 @@ public class GameplayUi extends UiBase {
         Scanner scanner = new Scanner(System.in);
         String input = "";
         while (input != "leave") {
-            System.out.printf(">>>");
-            input  = scanner.nextLine().strip().toLowerCase();
-            //handle input
+            System.out.printf("\n>>> ");
+            input = scanner.nextLine().strip().toLowerCase();
+            System.out.println(eval(input));
         }
     }
 
@@ -24,8 +33,13 @@ public class GameplayUi extends UiBase {
         String cmd = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
+            case "leave" -> leave();
             default -> "please enter a valid command";
         };
+    }
+
+    private String leave() {
+        return "leaving the game";
     }
 
 

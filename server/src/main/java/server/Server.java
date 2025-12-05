@@ -4,10 +4,13 @@ import dataaccess.MemoryDatabase;
 import handlers.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Server {
 
+    private static final Logger log = LoggerFactory.getLogger(Server.class);
     private final Javalin javalin;
     private MemoryDatabase memoryDatabase;
 
@@ -21,7 +24,8 @@ public class Server {
             .delete("/session", (Context ctx) -> new LogoutHandler(memoryDatabase).handle(ctx))
             .post("/game", (Context ctx) -> new CreateGameHandler(memoryDatabase).handle(ctx))
             .get("/game", (Context ctx) -> new ListGamesHandler(memoryDatabase).handle(ctx))
-            .put("/game", (Context ctx) -> new JoinGameHandler(memoryDatabase).handle(ctx));
+            .put("/game", (Context ctx) -> new JoinGameHandler(memoryDatabase).handle(ctx))
+            .delete("/game", (Context ctx) -> new RemovePlayerHandler(memoryDatabase).handle(ctx));
     }
 
     public int run(int desiredPort) {

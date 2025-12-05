@@ -66,6 +66,13 @@ public class ServerFacade {
         return handleResponse(response, JoinGameResponse.class);
     }
 
+    public RemovePlayerResponse leaveGame(RemovePlayerRequest removePlayerRequest) throws ResponseException {
+        RemovePlayerRequest removePlayerRequestBody = new RemovePlayerRequest(removePlayerRequest.gameID(), null);
+        var request = buildRequest("DELETE", "/game", removePlayerRequestBody, removePlayerRequest.authorization());
+        var response = sendRequest(request);
+        return handleResponse(response, RemovePlayerResponse.class);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {
         HttpRequest.BodyPublisher requestBody = (body != null) ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)) : HttpRequest.BodyPublishers.noBody();
         var request = HttpRequest.newBuilder()

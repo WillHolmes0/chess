@@ -63,6 +63,7 @@ public class ChessClient extends UiBase {
                 case "creategame" -> createGame(params);
                 case "observegame" -> observeGame(params);
                 case "logout" -> logOut(params);
+                case "leavegame" -> leaveGame(params);
                 case "quit" -> "exiting the chess app";
                 default -> help();
             };
@@ -121,19 +122,31 @@ public class ChessClient extends UiBase {
         if (params.length == 2) {
             String color = params[0].toLowerCase().strip();
             String gameKey = params[1];
-//            try {
-//                gameKey = Integer.parseInt(params[1]);
-//            } catch (NumberFormatException e) {
-//                throw new ResponseException("Error: input for gameID is not valid");
-//            }
             int gameID = selectGame(String.valueOf(gameKey)).gameID();
+
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
             server.joinGame(joinGameRequest);
             updateGameList();
+
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }
         throw new ResponseException("Incorrect number of inputs supplied");
     }
+
+    public String leaveGame(String... params) throws ResponseException {
+        if (params.length == 1) {
+            String gameKey = params[0];
+            int gameID = selectGame(String.valueOf(gameKey)).gameID();
+
+            RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(gameID, authToken);
+            RemovePlayerResponse removePlayerResponse = server.leaveGame(removePlayerRequest);
+            updateGameList();
+
+            return String.format("%s player %s left game no. %s\n", removePlayerResponse.color(), removePlayerResponse.username(), gameKey);
+        }
+        throw new ResponseException("Incorrect number of inputs supplied");
+    }
+
 
     public String listGames(String... params) throws ResponseException {
         if (params.length != 0) {
@@ -213,4 +226,5 @@ public class ChessClient extends UiBase {
             gameNumberCounter++;
         }
     }
+
 }
