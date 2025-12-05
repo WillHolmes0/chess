@@ -1,5 +1,4 @@
 import chess.ChessGame;
-import server.ServerFacade;
 import websocket.WebSocketFacade;
 
 import java.util.Arrays;
@@ -7,15 +6,17 @@ import java.util.Scanner;
 
 public class GameplayUi extends UiBase {
     private int chessGameID;
+    private ChessGame chessGame;
     private WebSocketFacade webSocketFacade;
     private ChessGame.TeamColor color;
     private String authentication;
 
-    public GameplayUi(String serverUrl, ServerFacade serverFacade, int chessGameID, ChessGame.TeamColor color, String authentication) {
+    public GameplayUi(String serverUrl, ChessGame chessGame, int chessGameID, ChessGame.TeamColor color, String authentication) {
         this.chessGameID = chessGameID;
         this.color = color;
         webSocketFacade = new WebSocketFacade(serverUrl);
         this.authentication = authentication;
+        this.chessGame = chessGame;
     }
 
     public void open() {
@@ -36,6 +37,7 @@ public class GameplayUi extends UiBase {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "leave" -> leave();
+            case "redraw" -> redrawBoard();
             default -> "please enter a valid command";
         };
     }
@@ -45,5 +47,7 @@ public class GameplayUi extends UiBase {
         return "left game on ui";
     }
 
-
+    private String redrawBoard() {
+        return drawGameBoard(chessGame, color);
+    }
 }

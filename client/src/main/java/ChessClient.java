@@ -14,7 +14,7 @@ public class ChessClient extends UiBase {
     private Map<String, GameData> gameList = new HashMap<>();
     private String serverUrl;
     private boolean enterGameUi = false;
-    private int currentChessGameID;
+    private String currentChessGameNo;
     private ChessGame.TeamColor currentChessPerspective;
 
     public ChessClient(String serverUrl) {
@@ -134,7 +134,7 @@ public class ChessClient extends UiBase {
             updateGameList();
 
             currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-            currentChessGameID = gameID;
+            currentChessGameNo = gameKey;
             enterGameUi = true;
 
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
@@ -237,7 +237,8 @@ public class ChessClient extends UiBase {
     }
 
     private void enterGame() {
-        GameplayUi gameplayUi = new GameplayUi(serverUrl, server, currentChessGameID, currentChessPerspective, authToken);
+        GameData currentGameData = selectGame(currentChessGameNo);
+        GameplayUi gameplayUi = new GameplayUi(serverUrl, currentGameData.game(), currentGameData.gameID(), currentChessPerspective, authToken);
         gameplayUi.open();
     }
 
