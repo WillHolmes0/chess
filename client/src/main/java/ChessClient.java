@@ -1,13 +1,9 @@
-import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import model.GameData;
 import requests.*;
 import responses.*;
 import server.ResponseException;
 import server.ServerFacade;
-import websocket.WebSocketFacade;
 
 import java.util.*;
 
@@ -16,19 +12,22 @@ public class ChessClient extends UiBase {
     private String playerName;
     private ServerFacade server;
     private Map<String, GameData> gameList = new HashMap<>();
-    private WebSocketFacade webSocketFacade;
+    private String serverUrl;
+    private boolean enterGameUi = false;
+    private int currentChessGameID;
+    private ChessGame.TeamColor currentChessPerspective;
 
     public ChessClient(String serverUrl) {
+        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
-        webSocketFacade = new WebSocketFacade(serverUrl);
     }
 
     public void run() {
         System.out.println("Welcome to the ChessServer");
 
         //chessboard display for testing
-//        login("willh", "passy");
-//        listGames();
+        login("willh", "passy");
+        listGames();
 //        String observableGame = observeGame("9764");
 //        System.out.print(observableGame);
         //end testing code
@@ -40,6 +39,10 @@ public class ChessClient extends UiBase {
             input = scanner.nextLine().strip().toLowerCase();
 
             System.out.println(eval(input));
+            if (enterGameUi) {
+                enterGame();
+                enterGameUi = false;
+            }
         }
     }
 
@@ -127,6 +130,10 @@ public class ChessClient extends UiBase {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
             server.joinGame(joinGameRequest);
             updateGameList();
+
+            currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            currentChessGameID = gameID;
+            enterGameUi = true;
 
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }
@@ -225,6 +232,11 @@ public class ChessClient extends UiBase {
             gameList.put(String.valueOf(gameNumberCounter), game);
             gameNumberCounter++;
         }
+    }
+
+    private void enterGame() {
+        GameplayUi gameplayUi = new GameplayUi(serverUrl, currentChessGameID, currentChessPerspective);
+        gameplayUi.open();
     }
 
 }

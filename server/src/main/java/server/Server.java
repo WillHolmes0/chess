@@ -13,9 +13,11 @@ public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
     private final Javalin javalin;
     private MemoryDatabase memoryDatabase;
+    private WebSocketHandler webSocketHandler;
 
     public Server() {
         this.memoryDatabase = new MemoryDatabase();
+        this.webSocketHandler = new WebSocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", (Context ctx) -> new RegisterHandler(memoryDatabase).handle(ctx))
@@ -25,7 +27,12 @@ public class Server {
             .post("/game", (Context ctx) -> new CreateGameHandler(memoryDatabase).handle(ctx))
             .get("/game", (Context ctx) -> new ListGamesHandler(memoryDatabase).handle(ctx))
             .put("/game", (Context ctx) -> new JoinGameHandler(memoryDatabase).handle(ctx))
-            .delete("/game", (Context ctx) -> new RemovePlayerHandler(memoryDatabase).handle(ctx));
+            .delete("/game", (Context ctx) -> new RemovePlayerHandler(memoryDatabase).handle(ctx))
+            .ws("/ws", ws -> {
+                ws.onConnect(webSocketHandler);
+                ws.onMessage(webSocketHandler);
+                ws.onClose(webSocketHandler);
+            });
     }
 
     public int run(int desiredPort) {

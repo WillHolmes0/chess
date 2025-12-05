@@ -1,19 +1,18 @@
 import chess.ChessGame;
+import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class GameplayUi extends UiBase {
-    private ChessGame chessGame;
+    private int chessGameID;
+    private WebSocketFacade webSocketFacade;
     private ChessGame.TeamColor color;
 
-    public GameplayUi(ChessGame chessGame) {
-        this.chessGame = chessGame;
-        if (color.equals("white")) {
-            this.color = ChessGame.TeamColor.WHITE;
-        } else {
-            this.color = ChessGame.TeamColor.BLACK;
-        }
+    public GameplayUi(String serverUrl, int chessGameID, ChessGame.TeamColor color) {
+        this.chessGameID = chessGameID;
+        this.color = color;
+        webSocketFacade = new WebSocketFacade(serverUrl);
     }
 
     public void open() {
