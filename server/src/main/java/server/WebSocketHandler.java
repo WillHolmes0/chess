@@ -7,6 +7,7 @@ import dataaccess.MemoryDatabase;
 import handlers.RemovePlayerHandler;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.server.Authentication;
+import org.eclipse.jetty.websocket.api.Session;
 import requests.EndGameRequest;
 import requests.RemovePlayerRequest;
 import requests.RetrieveUserRequest;
@@ -28,9 +29,12 @@ import websocket.messages.ServerMessage;
 
 import javax.management.Notification;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     MemoryDatabase memoryDatabase = new MemoryDatabase();
+    HashMap<String, ArrayList<Session>> gameClients;
 
 
     @Override
@@ -46,13 +50,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage serverMessage;
             System.out.println(userGameCommand.getCommandType());
             switch (userGameCommand.getCommandType()) {
-                case UserGameCommand.CommandType.CONNECT -> serverMessage = connectHandler(userGameCommand);
-                case UserGameCommand.CommandType.LEAVE -> serverMessage = removePlayerHandler(userGameCommand);
+                case UserGameCommand.CommandType.CONNECT -> serverMessage = connectHandler(userGameCommand, ctx);
+                case UserGameCommand.CommandType.LEAVE -> serverMessage = removePlayerHandler(userGameCommand, ctx);
                 case UserGameCommand.CommandType.MAKE_MOVE -> serverMessage = makeMoveHandler(ctx);
                 case UserGameCommand.CommandType.RESIGN -> serverMessage = endGameHandler(userGameCommand);
                 default -> throw new NoMatchException("Error: could get a valid command type from the UserGameCommand");
             }
-            ctx.session.getRemote().sendString(new Gson().toJson(serverMessage));
+            String gameID = String.valueOf(userGameCommand.getGameID());
+            for (var session : gameClients.get(gameID)) {
+                session.getRemote().sendString(new Gson().toJson(serverMessage));
+            }
+//          ctx.session.getRemote().sendString(new Gson().toJson(serverMessage));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -63,7 +71,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("websocket closed");
     }
 
-    public ServerMessage connectHandler(UserGameCommand userGameCommand) throws DataAccessException {
+    public ServerMessage connectHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException {
+        addSessionToGame(ctx, userGameCommand);
         RetrieveUserService retrieveUserService = new RetrieveUserService(memoryDatabase);
         RetrieveUserRequest retrieveUserRequest = new RetrieveUserRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         RetrieveUserResponse retrieveUserResponse = retrieveUserService.retrieveUser(retrieveUserRequest);
@@ -71,7 +80,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return new NotificationMessage(String.format("%s joined the game as %s", retrieveUserResponse.username(), playerType));
     }
 
-    public ServerMessage removePlayerHandler(UserGameCommand userGameCommand) throws DataAccessException {
+    public ServerMessage removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException {
+        removeSessionFromGame(ctx, userGameCommand);
         RemovePlayerService removePlayerService = new RemovePlayerService(memoryDatabase);
         RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
@@ -91,6 +101,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
         return new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+    }
+
+    private void addSessionToGame(WsMessageContext ctx, UserGameCommand userGameCommand) {
+        gameClients.get(String.valueOf(userGameCommand.getGameID())).add(ctx.session);
+    }
+
+    private void removeSessionFromGame(WsMessageContext ctx, UserGameCommand userGameCommand) {
+        gameClients.get(String.valueOf(userGameCommand.getGameID())).remove(ctx.session);
     }
 
     private String getPlayerType(String color) {
