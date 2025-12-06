@@ -47,22 +47,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx) {
         try {
             UserGameCommand userGameCommand = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-            ServerMessage serverMessage;
+//            ServerMessage serverMessage;
             System.out.println(userGameCommand.getCommandType());
             switch (userGameCommand.getCommandType()) {
-                case UserGameCommand.CommandType.CONNECT -> serverMessage = connectHandler(userGameCommand, ctx);
-                case UserGameCommand.CommandType.LEAVE -> serverMessage = removePlayerHandler(userGameCommand, ctx);
-                case UserGameCommand.CommandType.MAKE_MOVE -> serverMessage = makeMoveHandler(ctx);
-                case UserGameCommand.CommandType.RESIGN -> serverMessage = endGameHandler(userGameCommand);
+                case UserGameCommand.CommandType.CONNECT -> connectHandler(userGameCommand, ctx);
+                case UserGameCommand.CommandType.LEAVE -> removePlayerHandler(userGameCommand, ctx);
+                case UserGameCommand.CommandType.MAKE_MOVE -> makeMoveHandler(userGameCommand, ctx);
+                case UserGameCommand.CommandType.RESIGN -> endGameHandler(userGameCommand, ctx);
                 default -> throw new NoMatchException("Error: could get a valid command type from the UserGameCommand");
             }
-            String gameID = String.valueOf(userGameCommand.getGameID());
-            for (var session : gameClients.get(gameID)) {
-                session.getRemote().sendString(new Gson().toJson(serverMessage));
-            }
+//            String gameID = String.valueOf(userGameCommand.getGameID());
 //          ctx.session.getRemote().sendString(new Gson().toJson(serverMessage));
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void broadcast(String gameID, ServerMessage serverMessage, Session exclusion) throws IOException {
+        for (var session : gameClients.get(gameID)) {
+            if (session != exclusion) {
+                session.getRemote().sendString(new Gson().toJson(serverMessage));
+            }
         }
     }
 
@@ -71,36 +76,40 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("websocket closed");
     }
 
-    public ServerMessage connectHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException {
+    public void connectHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
         addSessionToGame(ctx, userGameCommand);
         RetrieveUserService retrieveUserService = new RetrieveUserService(memoryDatabase);
         RetrieveUserRequest retrieveUserRequest = new RetrieveUserRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         RetrieveUserResponse retrieveUserResponse = retrieveUserService.retrieveUser(retrieveUserRequest);
         String playerType = getPlayerType(retrieveUserResponse.color());
-        return new NotificationMessage(String.format("%s joined the game as %s", retrieveUserResponse.username(), playerType));
+        ServerMessage serverMessage = new NotificationMessage(String.format("%s joined the game as %s", retrieveUserResponse.username(), playerType));
+        broadcast(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
     }
 
-    public ServerMessage removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException {
+    public void removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
         removeSessionFromGame(ctx, userGameCommand);
         RemovePlayerService removePlayerService = new RemovePlayerService(memoryDatabase);
         RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
-        return new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
+        ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
+        broadcast(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
     }
 
-    public ServerMessage makeMoveHandler(WsMessageContext ctx) throws DataAccessException, InvalidMoveException {
+    public void makeMoveHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
         MakeMoveCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
         UpdateGameService updateGameService = new UpdateGameService(memoryDatabase);
         UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
         UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
-        return new LoadGameMessage(updateGameResponse.chessGame());
+        ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.chessGame());
+        broadcast(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
     }
 
-    public ServerMessage endGameHandler(UserGameCommand userGameCommand) throws DataAccessException {
+    public void endGameHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
         EndGameService endGameService = new EndGameService(memoryDatabase);
         EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
-        return new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+        ServerMessage serverMessage = new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+        broadcast(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
     }
 
     private void addSessionToGame(WsMessageContext ctx, UserGameCommand userGameCommand) {
