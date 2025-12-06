@@ -58,45 +58,62 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
         while (!input.equals("leave")) {
             System.out.printf("\n>>> ");
             input = scanner.nextLine().strip().toLowerCase();
-            System.out.println(eval(input));
+            eval(input);
         }
     }
 
-    private String eval(String input) {
+    private void eval(String input) {
         String[] tokens = input.split(" ");
         String cmd = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (cmd) {
+        switch (cmd) {
             case "leave" -> leave();
             case "redraw" -> redrawBoard();
             case "makemove" -> makeMove(params);
             case "highlightmoves" -> highlightMoves(params);
-            default -> "please enter a valid command";
+            case "resign" -> resign();
+            default -> help();
         };
     }
 
-    private String leave() {
-        webSocketFacade.leave(chessGameID, authentication);
-        return "left game on ui";
+    private void help() {
+        System.out.println(
+            """
+            leave - leaves the game
+            redraw - redraws the gameboard
+            makemove <cord1, cord2> makes a move in the game
+            showmoves <cord1> - highlights valid moves for a given piece
+            resign - admits defeats and ends the game
+            help - displays user options
+            """
+        );
     }
 
-    private String highlightMoves(String... params) {
+    private void leave() {
+        webSocketFacade.leave(chessGameID, authentication);
+    }
+
+    private void resign() {
+        webSocketFacade.resign(chessGameID, authentication);
+    }
+
+    private void highlightMoves(String... params) {
         if (params.length == 1) {
             String[] coordinates = params[0].split("");
             ChessPosition chessPosition = new ChessPosition(Integer.valueOf(coordinates[1]), evaluateCoordinate(coordinates[0]));
             Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
             Collection<ChessPosition> validPositions = new ArrayList<>();
             validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
-            return drawGameBoard(chessGame, color, validPositions);
+            System.out.println(drawGameBoard(chessGame, color, validPositions));
         }
         throw new ResponseException("Error: incorrect number of parameters for the given command");
     }
 
-    private String redrawBoard() {
-        return drawGameBoard(chessGame, color);
+    private void redrawBoard() {
+        System.out.println(drawGameBoard(chessGame, color));
     }
 
-    private String makeMove(String... params) {
+    private void makeMove(String... params) {
         if (params.length == 2) {
             String[] initialCords = params[0].split("");
             String[] finalCords = params[1].split("");
@@ -107,8 +124,9 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             System.out.println(String.format("Chessmove Cords %s,%s %s,%s", x1, y1, x2, y2));
             ChessMove chessMove = new ChessMove(new ChessPosition(x1, y1), new ChessPosition(x2, y2), null);
             webSocketFacade.makeMove(chessMove, chessGameID, authentication);
+        } else {
+            throw new ResponseException("Error: incorrect number of parameters for the given command");
         }
-        throw new ResponseException("Error: incorrect number of parameters for the given command");
     }
 
     private int evaluateCoordinate(String input) {

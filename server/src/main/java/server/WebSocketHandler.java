@@ -6,10 +6,13 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import handlers.RemovePlayerHandler;
 import io.javalin.websocket.*;
+import requests.EndGameRequest;
 import requests.RemovePlayerRequest;
 import requests.UpdateGameRequest;
+import responses.EndGameResponse;
 import responses.RemovePlayerResponse;
 import responses.UpdateGameResponse;
+import service.EndGameService;
 import service.RemovePlayerService;
 import service.UpdateGameService;
 import websocket.NoMatchException;
@@ -41,6 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (userGameCommand.getCommandType()) {
                 case UserGameCommand.CommandType.LEAVE -> serverMessage = removePlayerHandler(userGameCommand);
                 case UserGameCommand.CommandType.MAKE_MOVE -> serverMessage = makeMoveHandler(ctx);
+                case UserGameCommand.CommandType.RESIGN -> serverMessage = endGameHandler(userGameCommand);
                 default -> throw new NoMatchException("Error: could get a valid command type from the UserGameCommand");
             }
             ctx.session.getRemote().sendString(new Gson().toJson(serverMessage));
@@ -67,5 +71,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
         UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
         return new LoadGameMessage(updateGameResponse.chessGame());
+    }
+
+    public ServerMessage endGameHandler(UserGameCommand userGameCommand) throws DataAccessException {
+        EndGameService endGameService = new EndGameService(memoryDatabase);
+        EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+        EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
+        return new NotificationMessage(String.format("%s payer %s resigned the game", endGameResponse.color(), endGameResponse.username()));
     }
 }

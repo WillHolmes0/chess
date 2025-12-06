@@ -51,5 +51,10 @@ public class WebSocketFacade extends Endpoint {
         session.getAsyncRemote().sendText(new Gson().toJson(makeMoveCommand));
     }
 
+    public void resign(int gameID, String authentication) {
+        UserGameCommand userGameCommand = new UserGameCommand((UserGameCommand.CommandType.RESIGN), authentication, gameID);
+        session.getAsyncRemote().sendText(new Gson().toJson(userGameCommand));
+    }
+
 
 }

@@ -33,9 +33,7 @@ public class UpdateGameService {
         }
         GameData gameData = gameDAO.getGame(updateGameRequest.gameID());
         try {
-            System.out.println(updateGameRequest.chessMove().getStartPosition().getRow());
-            System.out.println(updateGameRequest.chessMove().getStartPosition().getColumn());
-            gameData.game().validMoves(updateGameRequest.chessMove().getStartPosition());
+//            gameData.game().validMoves(updateGameRequest.chessMove().getStartPosition());
             gameData.game().makeMove(updateGameRequest.chessMove());
             gameDAO.updateGame(gameData);
             return new UpdateGameResponse(gameData.game());
