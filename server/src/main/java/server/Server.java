@@ -29,7 +29,6 @@ public class Server {
             .put("/game", (Context ctx) -> new JoinGameHandler(memoryDatabase).handle(ctx))
             .put("/game/gamestate", (Context ctx) -> new UpdateGameHandler(memoryDatabase).handle(ctx))
             .delete("/game", (Context ctx) -> new RemovePlayerHandler(memoryDatabase).handle(ctx))
-                .put("/game/end", (Context ctx) -> new End)
             .ws("/ws", ws -> {
                 ws.onConnect(webSocketHandler);
                 ws.onMessage(webSocketHandler);

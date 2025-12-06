@@ -6,14 +6,18 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import handlers.RemovePlayerHandler;
 import io.javalin.websocket.*;
+import org.eclipse.jetty.server.Authentication;
 import requests.EndGameRequest;
 import requests.RemovePlayerRequest;
+import requests.RetrieveUserRequest;
 import requests.UpdateGameRequest;
 import responses.EndGameResponse;
 import responses.RemovePlayerResponse;
+import responses.RetrieveUserResponse;
 import responses.UpdateGameResponse;
 import service.EndGameService;
 import service.RemovePlayerService;
+import service.RetrieveUserService;
 import service.UpdateGameService;
 import websocket.NoMatchException;
 import websocket.commands.MakeMoveCommand;
@@ -42,6 +46,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage serverMessage;
             System.out.println(userGameCommand.getCommandType());
             switch (userGameCommand.getCommandType()) {
+                case UserGameCommand.CommandType.CONNECT -> serverMessage = connectHandler(userGameCommand);
                 case UserGameCommand.CommandType.LEAVE -> serverMessage = removePlayerHandler(userGameCommand);
                 case UserGameCommand.CommandType.MAKE_MOVE -> serverMessage = makeMoveHandler(ctx);
                 case UserGameCommand.CommandType.RESIGN -> serverMessage = endGameHandler(userGameCommand);
@@ -56,6 +61,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(WsCloseContext ctx) {
         System.out.println("websocket closed");
+    }
+
+    public ServerMessage connectHandler(UserGameCommand userGameCommand) throws DataAccessException {
+        RetrieveUserService retrieveUserService = new RetrieveUserService(memoryDatabase);
+        RetrieveUserRequest retrieveUserRequest = new RetrieveUserRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+        RetrieveUserResponse retrieveUserResponse = retrieveUserService.retrieveUser(retrieveUserRequest);
+        String playerType = getPlayerType(retrieveUserResponse.color());
+        return new NotificationMessage(String.format("%s joined the game as %s", retrieveUserResponse.username(), playerType));
     }
 
     public ServerMessage removePlayerHandler(UserGameCommand userGameCommand) throws DataAccessException {
@@ -77,6 +90,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         EndGameService endGameService = new EndGameService(memoryDatabase);
         EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
-        return new NotificationMessage(String.format("%s payer %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+        return new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+    }
+
+    private String getPlayerType(String color) {
+        return switch (color) {
+            case "white" -> "the white player";
+            case "black" -> "the black player";
+            default -> "an obvserver";
+        };
     }
 }
+

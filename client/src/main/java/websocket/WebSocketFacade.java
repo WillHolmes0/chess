@@ -41,6 +41,11 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
+    public void connect(int gameID, String authentication) {
+        UserGameCommand userGameCommand = new UserGameCommand((UserGameCommand.CommandType.CONNECT), authentication, gameID);
+        session.getAsyncRemote().sendText(new Gson().toJson(userGameCommand));
+    }
+
     public void leave(int gameID, String authentication) {
         UserGameCommand userGameCommand = new UserGameCommand((UserGameCommand.CommandType.LEAVE), authentication, gameID);
         session.getAsyncRemote().sendText(new Gson().toJson(userGameCommand));

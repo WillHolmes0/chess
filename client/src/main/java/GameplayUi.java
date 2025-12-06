@@ -52,6 +52,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
 
     public void open() {
         System.out.println("Gameplay Mode Entered");
+        webSocketFacade.connect(chessGameID, authentication);
 
         Scanner scanner = new Scanner(System.in);
         String input = "";
@@ -121,7 +122,6 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             int x1 = Integer.valueOf(initialCords[1]);
             int y2 = evaluateCoordinate(finalCords[0]);
             int x2 = Integer.valueOf(finalCords[1]);
-            System.out.println(String.format("Chessmove Cords %s,%s %s,%s", x1, y1, x2, y2));
             ChessMove chessMove = new ChessMove(new ChessPosition(x1, y1), new ChessPosition(x2, y2), null);
             webSocketFacade.makeMove(chessMove, chessGameID, authentication);
         } else {
