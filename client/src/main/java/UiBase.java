@@ -1,11 +1,15 @@
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class UiBase {
 
     protected String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective) {
+        return drawGameBoard(chessGame, perspective, new ArrayList<>());
+    }
+
+    protected String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective, Collection<ChessPosition> highlighedSquares) {
         ChessBoard chessBoard = chessGame.getBoard();
         String chessBoardString = "";
         int square = 0;
@@ -34,11 +38,13 @@ public class UiBase {
                         int asciiCode = 0x40 + j;
                         chessBoardString += String.format(" %c  ", asciiCode);
                     } else {
+                        String backgroundColor;
                         if (square % 2 == 1) {
-                            chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                            backgroundColor = (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                         } else {
-                            chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                            backgroundColor = (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                         }
+                        chessBoardString += highlightIfValidMove(new ChessPosition(i, j), backgroundColor, highlighedSquares);
                         ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
                         chessBoardString += getPieceString(chessPiece);
                     }
@@ -72,11 +78,13 @@ public class UiBase {
                         int asciiCode = 0x40 + j;
                         chessBoardString += String.format(" %c  ", asciiCode);
                     } else {
+                        String backgroundColor;
                         if (square % 2 == 1) {
-                            chessBoardString += (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                            backgroundColor = (EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                         } else {
-                            chessBoardString += (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                            backgroundColor = (EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                         }
+                        chessBoardString += highlightIfValidMove(new ChessPosition(i, j), backgroundColor, highlighedSquares);
                         ChessPiece chessPiece = chessBoard.getPiece(new ChessPosition(i, j));
                         chessBoardString += getPieceString(chessPiece);
                     }
@@ -89,6 +97,15 @@ public class UiBase {
         return chessBoardString;
     }
 
+    private String highlightIfValidMove(ChessPosition chessPosition, String positionColor, Collection<ChessPosition> highlightedPositions) {
+        if (highlightedPositions.contains(chessPosition)) {
+            if (positionColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)) {
+                return EscapeSequences.SET_BG_COLOR_BRIGHT_BLUE;
+            }
+            return EscapeSequences.SET_BG_COLOR_LIGHT_BLUE;
+        }
+        return positionColor;
+    }
 
     private String getPieceString(ChessPiece piece) {
         if (piece == null) {

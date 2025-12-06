@@ -28,8 +28,10 @@ public class ChessClient extends UiBase {
         //chessboard display for testing
         System.out.println(login("r", "t"));
         System.out.println(listGames());
-//        System.out.println(leaveGame("1"));
-        System.out.println(joinGame("white", "1"));
+        System.out.println(leaveGame("2"));
+        System.out.println(joinGame("white", "2"));
+//        System.out.println(leaveGame("2"));
+//        System.out.println(joinGame("black", "2"));
 //        String observableGame = observeGame("9764");
 //        System.out.print(observableGame);
         //end testing code
