@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -17,20 +18,27 @@ public class UpdateGameService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException {
+    public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException{
 //        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
 //        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         AuthDAO authDAO = new DatabaseAuthDAO();
         GameDAO gameDAO = new DatabaseGameDAO();
 
-        if (updateGameRequest.gameData() == null || updateGameRequest.authorization() == null) {
+        if (updateGameRequest.chessMove() == null || updateGameRequest.gameID() == 0 || updateGameRequest.authorization() == null) {
             throw new BadRequestException("Error: missing field");
         }
         AuthData authData = authDAO.getAuthData(updateGameRequest.authorization());
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
-        gameDAO.updateGame(updateGameRequest.gameData());
-        return new UpdateGameResponse(updateGameRequest.gameData());
+        GameData gameData = gameDAO.getGame(updateGameRequest.gameID());
+        try {
+            gameData.game().makeMove(updateGameRequest.chessMove());
+            gameDAO.updateGame(gameData);
+            return new UpdateGameResponse(gameData.game());
+        } catch (InvalidMoveException e) {
+            throw new BadRequestException("Error: invalid move supplied");
+        }
+
     }
 }

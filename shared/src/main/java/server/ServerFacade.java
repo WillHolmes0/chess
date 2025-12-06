@@ -74,7 +74,7 @@ public class ServerFacade {
     }
 
     public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws ResponseException {
-        UpdateGameRequest updateGameRequestbody = new UpdateGameRequest(updateGameRequest.gameData(), null);
+        UpdateGameRequest updateGameRequestbody = new UpdateGameRequest(updateGameRequest.chessMove(), updateGameRequest.gameID(), null);
         var request = buildRequest("PUT", "/game/gamestate", updateGameRequestbody, updateGameRequest.authorization());
         var response = sendRequest(request);
         return handleResponse(response, UpdateGameResponse.class);

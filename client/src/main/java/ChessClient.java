@@ -29,7 +29,7 @@ public class ChessClient extends UiBase {
         System.out.println(login("r", "t"));
         System.out.println(listGames());
 //        System.out.println(leaveGame("1"));
-        System.out.println(joinGame("black", "1"));
+        System.out.println(joinGame("white", "1"));
 //        String observableGame = observeGame("9764");
 //        System.out.print(observableGame);
         //end testing code
@@ -125,6 +125,7 @@ public class ChessClient extends UiBase {
 
     public String joinGame(String... params) throws ResponseException {
         if (params.length == 2) {
+            enterGameUi = true;
             String color = params[0].toLowerCase().strip();
             String gameKey = params[1];
             int gameID = selectGame(String.valueOf(gameKey)).gameID();
@@ -135,7 +136,6 @@ public class ChessClient extends UiBase {
 
             currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
             currentChessGameNo = gameKey;
-            enterGameUi = true;
 
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }

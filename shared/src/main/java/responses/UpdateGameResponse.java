@@ -1,6 +1,7 @@
 package responses;
 
+import chess.ChessGame;
 import model.GameData;
 
-public record UpdateGameResponse(GameData gameData) {
+public record UpdateGameResponse(ChessGame chessGame) {
 }

@@ -1,5 +1,6 @@
 package handlers;
 
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
@@ -25,7 +26,7 @@ public class UpdateGameHandler {
 
     public void handle(Context ctx) {
         UpdateGameRequest updateGameRequestBody = new Gson().fromJson(ctx.body(), UpdateGameRequest.class);
-        UpdateGameRequest updateGameRequest = new UpdateGameRequest(updateGameRequestBody.gameData(), ctx.header("authorization"));
+        UpdateGameRequest updateGameRequest = new UpdateGameRequest(updateGameRequestBody.chessMove(), updateGameRequestBody.gameID(), ctx.header("authorization"));
         try {
             UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
             ctx.status(200);
