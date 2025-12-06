@@ -45,7 +45,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
 
     public void handleLoadGameMessage(String message) {
         LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
-        chessGame = loadGameMessage.getGame();
+        chessGame = loadGameMessage.game();
         drawGameBoard(chessGame, color);
     }
 

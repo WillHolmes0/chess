@@ -11,10 +11,12 @@ import service.*;
 import websocket.NoMatchException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+//import java.io.IO;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,45 +66,61 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("websocket closed");
     }
 
-    public void connectHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException, NoMatchException {
-        addSessionToGame(ctx, userGameCommand);
-        RetrievePlayerGameService retrievePlayerGameService = new RetrievePlayerGameService(memoryDatabase);
-        RetrievePlayerGameRequest retrievePlayerGameRequest = new RetrievePlayerGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
-        RetrievePlayerGameResponse retrievePlayerGameResponse = retrievePlayerGameService.retrieveData(retrievePlayerGameRequest);
+    public void connectHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws IOException {
+        try {
+            addSessionToGame(ctx, userGameCommand);
+            RetrievePlayerGameService retrievePlayerGameService = new RetrievePlayerGameService(memoryDatabase);
+            RetrievePlayerGameRequest retrievePlayerGameRequest = new RetrievePlayerGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+            RetrievePlayerGameResponse retrievePlayerGameResponse = retrievePlayerGameService.retrieveData(retrievePlayerGameRequest);
 
-        String playerRole = getPlayerRoleString(retrievePlayerGameResponse.role());
-        NotificationMessage notificationMessage = new NotificationMessage(String.format("%s joined the game as %s", retrievePlayerGameResponse.username(), playerRole));
+            String playerRole = getPlayerRoleString(retrievePlayerGameResponse.role());
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s joined the game as %s", retrievePlayerGameResponse.username(), playerRole));
+            broadcastOthers(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
 
-        broadcastOthers(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
-
-        LoadGameMessage loadGameMessage = new LoadGameMessage(retrievePlayerGameResponse.chessGame());
-        broadcastSelf(String.valueOf(userGameCommand.getGameID()), loadGameMessage, ctx.session);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(retrievePlayerGameResponse.chessGame());
+            System.out.println(retrievePlayerGameResponse.chessGame());
+            broadcastSelf(String.valueOf(userGameCommand.getGameID()), loadGameMessage, ctx.session);
+        } catch (DataAccessException e) {
+            errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
+        }
     }
 
-    public void removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
-        removeSessionFromGame(ctx, userGameCommand);
-        RemovePlayerService removePlayerService = new RemovePlayerService(memoryDatabase);
-        RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
-        RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
-        ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
-        broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+    public void removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws IOException {
+        try {
+            removeSessionFromGame(ctx, userGameCommand);
+            RemovePlayerService removePlayerService = new RemovePlayerService(memoryDatabase);
+            RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+            RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
+            ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
+            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+        } catch (DataAccessException e) {
+            errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
+        }
     }
 
-    public void makeMoveHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
-        MakeMoveCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
-        UpdateGameService updateGameService = new UpdateGameService(memoryDatabase);
-        UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
-        UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
-        ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.chessGame());
-        broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+    public void makeMoveHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws IOException {
+        try {
+            MakeMoveCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+            UpdateGameService updateGameService = new UpdateGameService(memoryDatabase);
+            UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
+            UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
+            ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.chessGame());
+            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+        } catch (DataAccessException e) {
+            errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
+        }
     }
 
     public void endGameHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
-        EndGameService endGameService = new EndGameService(memoryDatabase);
-        EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
-        EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
-        ServerMessage serverMessage = new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
-        broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
+        try {
+            EndGameService endGameService = new EndGameService(memoryDatabase);
+            EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+            EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
+            ServerMessage serverMessage = new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
+            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
+        } catch (DataAccessException e) {
+            errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
+        }
     }
 
     private void addSessionToGame(WsMessageContext ctx, UserGameCommand userGameCommand) {
@@ -125,6 +143,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return "an observer";
         }
         throw new NoMatchException("Error: could not retrieve a valid role for the user");
+    }
+
+    private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
+        String gameIDString = String.valueOf(gameID);
+        broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
     }
 }
 
