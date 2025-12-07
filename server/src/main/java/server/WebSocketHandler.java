@@ -9,6 +9,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import requests.*;
 import responses.*;
 import service.*;
+import service.exception.BadRequestException;
+import service.exception.UnauthorizedException;
 import websocket.NoMatchException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -81,7 +83,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             LoadGameMessage loadGameMessage = new LoadGameMessage(retrievePlayerGameResponse.chessGame());
             System.out.println(retrievePlayerGameResponse.chessGame());
             broadcastSelf(String.valueOf(userGameCommand.getGameID()), loadGameMessage, ctx.session);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | UnauthorizedException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
     }
@@ -94,7 +96,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
             ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
             broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | UnauthorizedException | NoMatchException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
     }
@@ -111,19 +113,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             handleCheck(updateGameResponse.chessGame(), ctx);
             handleCheckmate(updateGameResponse.chessGame(), ctx);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | BadRequestException | UnauthorizedException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
     }
 
-    public void endGameHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws DataAccessException, IOException {
+    public void endGameHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws IOException {
         try {
             EndGameService endGameService = new EndGameService(memoryDatabase);
             EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
             ServerMessage serverMessage = new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
             broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | UnauthorizedException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
     }

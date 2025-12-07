@@ -18,7 +18,7 @@ public class UpdateGameService {
         this.memoryDatabase = memoryDatabase;
     }
 
-    public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException{
+    public UpdateGameResponse updateGame(UpdateGameRequest updateGameRequest) throws DataAccessException, UnauthorizedException, BadRequestException {
 //        AuthDAO authDAO = new MemoryAuthDAO(memoryDatabase);
 //        GameDAO gameDAO = new MemoryGameDAO(memoryDatabase);
         AuthDAO authDAO = new DatabaseAuthDAO();
