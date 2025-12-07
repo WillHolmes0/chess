@@ -4,6 +4,7 @@ import requests.*;
 import responses.*;
 import server.ResponseException;
 import server.ServerFacade;
+import websocket.NoMatchException;
 
 import java.util.*;
 
@@ -68,7 +69,7 @@ public class ChessClient extends UiBase {
                 case "joingame" -> joinGame(params);
                 case "listgames" -> listGames(params);
                 case "creategame" -> createGame(params);
-                case "observegame" -> observeGame(params);
+                case "observegame" -> observeGameCallable(params);
                 case "logout" -> logOut(params);
                 case "leavegame" -> leaveGame(params);
                 case "quit" -> "exiting the chess app";
@@ -132,12 +133,12 @@ public class ChessClient extends UiBase {
             String gameKey = params[1];
             int gameID = selectGame(String.valueOf(gameKey)).gameID();
 
-            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
-            server.joinGame(joinGameRequest);
-            updateGameList();
+//            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
+//            server.joinGame(joinGameRequest);
+//            updateGameList();
 
-            currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-            currentChessGameNo = gameKey;
+//            currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+//            currentChessGameNo = gameKey;
 
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }
@@ -180,26 +181,30 @@ public class ChessClient extends UiBase {
         return gameListString;
     }
 
-    public String observeGame(String... params) throws ResponseException {
-        ChessGame.TeamColor teamColor;
-        if (params.length != 1 && params.length != 2) {
-            throw new ResponseException("Incorrect number of inputs supplied");
+    public String observeGameCallable(String... params) {
+        if (params.length == 1) {
+            return observeGame(params[0], "white");
         }
-        if (params.length == 2) {
-            String color = params[1].strip().toLowerCase();
-            if (color.equals("white")) {
-                teamColor = ChessGame.TeamColor.WHITE;
-            } else if (color.equals("black")) {
-                teamColor = ChessGame.TeamColor.BLACK;
-            } else {
-                throw new ResponseException(String.format("your provided color (%s) is invalid. It should be black or white", color));
-            }
-        } else {
-            teamColor = ChessGame.TeamColor.WHITE;
+        throw new ResponseException("Incorrect number of inputs supplied");
+    }
+
+    private String observeGame(String gameKey, String color) throws ResponseException {
+        try {
+            ChessGame.TeamColor teamColor = stringToTeamColor(color);
+            GameData gameData = selectGame(gameKey);
+            ChessGame chessGame = gameData.game();
+
+            currentChessPerspective = teamColor;
+            currentChessGameNo = gameKey;
+
+            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameData.gameID(), authToken);
+            server.joinGame(joinGameRequest);
+            updateGameList();
+
+            return "\n" + drawGameBoard(chessGame, teamColor) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
+        } catch (NoMatchException e) {
+            throw new ResponseException(e.getMessage());
         }
-        String gameID = params[0];
-        ChessGame chessGame = selectGame(gameID).game();
-        return "\n" + drawGameBoard(chessGame, teamColor) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
     }
 
     public String help() {
@@ -242,6 +247,19 @@ public class ChessClient extends UiBase {
         GameData currentGameData = selectGame(currentChessGameNo);
         GameplayUi gameplayUi = new GameplayUi(serverUrl, currentGameData.game(), currentGameData.gameID(), currentChessPerspective, authToken);
         gameplayUi.open();
+    }
+
+    public String teamColorToString(ChessGame.TeamColor teamColor) {
+        return (teamColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
+    }
+
+    public ChessGame.TeamColor stringToTeamColor(String color) throws NoMatchException {
+        if (color.equals("white")) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (color.equals("black")) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        throw new NoMatchException("Error: the color given was not valid");
     }
 
 }
