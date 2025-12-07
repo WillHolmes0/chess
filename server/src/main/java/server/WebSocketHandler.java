@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
@@ -104,8 +105,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UpdateGameService updateGameService = new UpdateGameService(memoryDatabase);
             UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
             UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
+
             ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.chessGame());
             broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+
+            handleCheck(updateGameResponse.chessGame(), ctx);
+            handleCheckmate(updateGameResponse.chessGame(), ctx);
         } catch (DataAccessException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
@@ -148,6 +153,28 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
         String gameIDString = String.valueOf(gameID);
         broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
+    }
+
+    private void handleCheck(ChessGame chessGame, WsMessageContext ctx) throws IOException {
+        if (chessGame.isInCheck(ChessGame.TeamColor.WHITE)) {
+            NotificationMessage notificationMessage = new NotificationMessage("white player is in check");
+            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+        }
+        if (chessGame.isInCheck(ChessGame.TeamColor.BLACK)) {
+            NotificationMessage notificationMessage = new NotificationMessage("black player is in check");
+            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+        }
+    }
+
+    private void handleCheckmate(ChessGame chessGame, WsMessageContext ctx) throws IOException {
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            NotificationMessage notificationMessage = new NotificationMessage("white player has been checkmated");
+            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+        }
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            NotificationMessage notificationMessage = new NotificationMessage("black player has been checkmated");
+            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+        }
     }
 }
 
