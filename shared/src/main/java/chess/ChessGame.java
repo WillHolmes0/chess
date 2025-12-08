@@ -14,7 +14,7 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard chessBoard;
-    private boolean isActive;
+    private boolean active;
 
     private boolean noValidMoves(TeamColor teamColor) {
         for (int i = 1; i <= 8; i++) {
@@ -69,7 +69,7 @@ public class ChessGame {
         teamTurn = TeamColor.WHITE;
         chessBoard = new ChessBoard();
         chessBoard.resetBoard();
-        isActive = true;
+        active = true;
     }
 
     public TeamColor getTeamTurn() {
@@ -108,6 +108,10 @@ public class ChessGame {
         return validMoves;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public boolean putsInCheck(ChessMove potentialMove) {
         ChessPiece piece = chessBoard.getPiece(potentialMove.getStartPosition());
         ChessPiece takenPiece = chessBoard.getPiece(potentialMove.getEndPosition());
@@ -131,7 +135,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (!isActive) {
+        if (!active) {
             throw new InvalidMoveException("Error: The game is over. No more moves can be made");
         }
         if (!isMovablePiece(move.getStartPosition())) {
@@ -152,7 +156,7 @@ public class ChessGame {
     }
 
     public void endGame() {
-        isActive = false;
+        active = false;
     }
 
     /**

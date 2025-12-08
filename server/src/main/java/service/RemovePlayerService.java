@@ -37,7 +37,9 @@ public class RemovePlayerService {
         if (authData != null) {
             String username = authData.username();
             ChessGame.TeamColor playerColor = getUsernameColorFromGame(username, gameData);
-            gameDAO.setPlayer(null, playerColor, removePlayerRequest.gameID());
+            if (playerColor != null) {
+                gameDAO.setPlayer(null, playerColor, removePlayerRequest.gameID());
+            }
 
             String playerColorString = (playerColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
             return new RemovePlayerResponse(playerColorString, username);
@@ -50,8 +52,7 @@ public class RemovePlayerService {
             return ChessGame.TeamColor.WHITE;
         } else if (username.equals(gameData.blackUsername())) {
             return ChessGame.TeamColor.BLACK;
-        } else {
-            throw new NoMatchException("Error: The user is not listed as either color");
         }
+        return null;
     }
 }

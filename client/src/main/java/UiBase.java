@@ -1,19 +1,20 @@
 import chess.*;
+import websocket.NoMatchException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class UiBase {
 
-    protected String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective) {
+    protected String drawGameBoard(ChessGame chessGame, String perspective) {
         return drawGameBoard(chessGame, perspective, new ArrayList<>());
     }
 
-    protected String drawGameBoard(ChessGame chessGame, ChessGame.TeamColor perspective, Collection<ChessPosition> highlighedSquares) {
+    protected String drawGameBoard(ChessGame chessGame, String perspective, Collection<ChessPosition> highlighedSquares) {
         ChessBoard chessBoard = chessGame.getBoard();
         String chessBoardString = "";
         int square = 0;
-        if (perspective == ChessGame.TeamColor.WHITE) {
+        if (perspective.equals("white") || perspective.equals("observer")) {
             for (int i = 9; i >= 0; i--) {
                 for (int j = 0; j <= 9; j++) {
                     if (j == 0) {
@@ -126,5 +127,18 @@ public class UiBase {
             case ChessPiece.PieceType.QUEEN -> EscapeSequences.BLACK_QUEEN;
         };
         return chessPieceString;
+    }
+
+    public String teamColorToString(ChessGame.TeamColor teamColor) {
+        return (teamColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
+    }
+
+    public ChessGame.TeamColor stringToTeamColor(String color) throws NoMatchException {
+        if (color.equals("white")) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (color.equals("black")) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        throw new NoMatchException("Error: the color given was not valid");
     }
 }

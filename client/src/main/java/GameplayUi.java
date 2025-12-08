@@ -18,12 +18,12 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
     private int chessGameID;
     private ChessGame chessGame;
     private WebSocketFacade webSocketFacade;
-    private ChessGame.TeamColor color;
+    private String perspective;
     private String authentication;
 
-    public GameplayUi(String serverUrl, ChessGame chessGame, int chessGameID, ChessGame.TeamColor color, String authentication) {
+    public GameplayUi(String serverUrl, ChessGame chessGame, int chessGameID, String perspective, String authentication) {
         this.chessGameID = chessGameID;
-        this.color = color;
+        this.perspective = perspective;
         webSocketFacade = new WebSocketFacade(serverUrl, this);
         this.authentication = authentication;
         this.chessGame = chessGame;
@@ -46,7 +46,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
     public void handleLoadGameMessage(String message) {
         LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
         chessGame = loadGameMessage.game();
-        drawGameBoard(chessGame, color);
+        drawGameBoard(chessGame, perspective);
     }
 
 
@@ -105,13 +105,13 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
             Collection<ChessPosition> validPositions = new ArrayList<>();
             validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
-            System.out.println(drawGameBoard(chessGame, color, validPositions));
+            System.out.println(drawGameBoard(chessGame, perspective, validPositions));
         }
         throw new ResponseException("Error: incorrect number of parameters for the given command");
     }
 
     private void redrawBoard() {
-        System.out.println(drawGameBoard(chessGame, color));
+        System.out.println(drawGameBoard(chessGame, perspective));
     }
 
     private void makeMove(String... params) {
@@ -123,6 +123,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             int y2 = evaluateCoordinate(finalCords[0]);
             int x2 = Integer.valueOf(finalCords[1]);
             ChessMove chessMove = new ChessMove(new ChessPosition(x1, y1), new ChessPosition(x2, y2), null);
+
             webSocketFacade.makeMove(chessMove, chessGameID, authentication);
         } else {
             throw new ResponseException("Error: incorrect number of parameters for the given command");

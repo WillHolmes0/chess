@@ -32,6 +32,9 @@ public class EndGameService {
             throw new UnauthorizedException("Error: unauthorized");
         }
         GameData gameData = gameDAO.getGame(endGameRequest.gameID());
+        if (!gameData.game().isActive()) {
+            throw new BadRequestException("Error: you cannot resign the game as it is no longer being played");
+        }
         String color;
         if (gameData.whiteUsername().equals(authData.username())) {
             color = "white";

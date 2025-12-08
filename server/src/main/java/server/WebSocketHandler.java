@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDatabase;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import requests.*;
 import responses.*;
@@ -52,7 +53,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void broadcastOthers(String gameID, ServerMessage serverMessage, Session exclusion) throws IOException {
+    private void broadcastAll(String gameID, ServerMessage serverMessage, Session exclusion) throws IOException {
         for (var session : gameClients.get(gameID)) {
             if (session != exclusion) {
                 session.getRemote().sendString(new Gson().toJson(serverMessage));
@@ -78,7 +79,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             String playerRole = getPlayerRoleString(retrievePlayerGameResponse.role());
             NotificationMessage notificationMessage = new NotificationMessage(String.format("%s joined the game as %s", retrievePlayerGameResponse.username(), playerRole));
-            broadcastOthers(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(retrievePlayerGameResponse.chessGame());
             System.out.println(retrievePlayerGameResponse.chessGame());
@@ -95,7 +96,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
             ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
-            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
         } catch (DataAccessException | UnauthorizedException | NoMatchException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
@@ -108,11 +109,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UpdateGameRequest updateGameRequest = new UpdateGameRequest(makeMoveCommand.getChessMove(), makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken());
             UpdateGameResponse updateGameResponse = updateGameService.updateGame(updateGameRequest);
 
-            ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.chessGame());
-            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+            ServerMessage serverMessage = new LoadGameMessage(updateGameResponse.gameData().game());
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
 
-            handleCheck(updateGameResponse.chessGame(), ctx);
-            handleCheckmate(updateGameResponse.chessGame(), ctx);
+            NotificationMessage notificationMessage = new NotificationMessage(
+                String.format("%s player moved %s from %s to %s",
+                updateGameResponse.username(),
+                updateGameResponse.chessPiece(),
+                updateGameResponse.startPosition(),
+                updateGameResponse.endPosition()
+                ));
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
+
+            handleCheck(updateGameResponse.gameData(), ctx);
+
         } catch (DataAccessException | BadRequestException | UnauthorizedException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
@@ -124,7 +134,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             EndGameRequest endGameRequest = new EndGameRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             EndGameResponse endGameResponse = endGameService.endGame(endGameRequest);
             ServerMessage serverMessage = new NotificationMessage(String.format("%s player %s resigned the game", endGameResponse.color(), endGameResponse.username()));
-            broadcastOthers(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
         } catch (DataAccessException | UnauthorizedException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
@@ -154,29 +164,46 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
         String gameIDString = String.valueOf(gameID);
+        System.out.println(message);
         broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
     }
 
-    private void handleCheck(ChessGame chessGame, WsMessageContext ctx) throws IOException {
-        if (chessGame.isInCheck(ChessGame.TeamColor.WHITE)) {
-            NotificationMessage notificationMessage = new NotificationMessage("white player is in check");
-            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+    private void handleCheck(GameData gameData, WsMessageContext ctx) throws IOException {
+        String checkmateMessage = getPlayerInCheckmate(gameData);
+        if (checkmateMessage != null) {
+            NotificationMessage notificationMessage = new NotificationMessage(checkmateMessage);
+            broadcastAll(String.valueOf(gameData.gameID()), notificationMessage, null);
+        } else {
+            String checkMessage = getPlayerInCheck(gameData);
+            if (checkMessage != null) {
+                NotificationMessage notificationMessage = new NotificationMessage(checkMessage);
+                broadcastAll(String.valueOf(gameData.gameID()), notificationMessage, null);
+            }
         }
-        if (chessGame.isInCheck(ChessGame.TeamColor.BLACK)) {
-            NotificationMessage notificationMessage = new NotificationMessage("black player is in check");
-            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
-        }
+
     }
 
-    private void handleCheckmate(ChessGame chessGame, WsMessageContext ctx) throws IOException {
-        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            NotificationMessage notificationMessage = new NotificationMessage("white player has been checkmated");
-            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+    private String getPlayerInCheck(GameData gameData) {
+        ChessGame chessGame = gameData.game();
+        if(chessGame.isInCheck(ChessGame.TeamColor.WHITE)) {
+            return String.format("white player %s is in check", gameData.whiteUsername());
+        }
+        if (chessGame.isInCheck(ChessGame.TeamColor.BLACK)) {
+            return String.format("black player %s is in check", gameData.blackUsername());
+        }
+        return null;
+    }
+
+    private String getPlayerInCheckmate(GameData gameData) {
+        ChessGame chessGame = gameData.game();
+        if(chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            return String.format("white player %s is in checkmate", gameData.whiteUsername());
         }
         if (chessGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            NotificationMessage notificationMessage = new NotificationMessage("black player has been checkmated");
-            ctx.session.getRemote().sendString(new Gson().toJson(notificationMessage));
+            return String.format("black player %s is in checkmate", gameData.blackUsername());
         }
+        return null;
     }
+
 }
 

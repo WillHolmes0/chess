@@ -30,6 +30,9 @@ public class RetrievePlayerGameService {
             throw new UnauthorizedException("Error: unauthorized");
         }
         GameData gameData = gameDAO.getGame(retrieveGameDataRequest.gameID());
+        if (gameData == null) {
+            throw new BadRequestException("Error: could not get game from given gameID");
+        }
         String role = getRole(authData.username(), gameData);
         return new RetrievePlayerGameResponse(gameData.game(), role, authData.username());
 

@@ -16,7 +16,7 @@ public class ChessClient extends UiBase {
     private String serverUrl;
     private boolean enterGameUi = false;
     private String currentChessGameNo;
-    private ChessGame.TeamColor currentChessPerspective;
+    private String currentChessPerspective;
 
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -29,7 +29,7 @@ public class ChessClient extends UiBase {
         //chessboard display for testing
         System.out.println(login("r", "t"));
         System.out.println(listGames());
-        System.out.println(leaveGame("2"));
+        System.out.println(leaveGame("1"));
         System.out.println(joinGame("white", "2"));
 //        System.out.println(leaveGame("2"));
 //        System.out.println(joinGame("black", "2"));
@@ -128,17 +128,16 @@ public class ChessClient extends UiBase {
 
     public String joinGame(String... params) throws ResponseException {
         if (params.length == 2) {
-            enterGameUi = true;
             String color = params[0].toLowerCase().strip();
             String gameKey = params[1];
             int gameID = selectGame(String.valueOf(gameKey)).gameID();
 
-//            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
-//            server.joinGame(joinGameRequest);
-//            updateGameList();
+            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
+            server.joinGame(joinGameRequest);
+            updateGameList();
 
-//            currentChessPerspective = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-//            currentChessGameNo = gameKey;
+            currentChessPerspective = color;
+            currentChessGameNo = gameKey;
 
             return String.format("Joined game no. %s, as %s player\n", gameKey, color) + observeGame(gameKey, color);
         }
@@ -183,6 +182,9 @@ public class ChessClient extends UiBase {
 
     public String observeGameCallable(String... params) {
         if (params.length == 1) {
+            String gameKey = params[0];
+            currentChessPerspective = "observer";
+            currentChessGameNo = gameKey;
             return observeGame(params[0], "white");
         }
         throw new ResponseException("Incorrect number of inputs supplied");
@@ -190,18 +192,11 @@ public class ChessClient extends UiBase {
 
     private String observeGame(String gameKey, String color) throws ResponseException {
         try {
-            ChessGame.TeamColor teamColor = stringToTeamColor(color);
+            enterGameUi = true;
             GameData gameData = selectGame(gameKey);
             ChessGame chessGame = gameData.game();
 
-            currentChessPerspective = teamColor;
-            currentChessGameNo = gameKey;
-
-            JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameData.gameID(), authToken);
-            server.joinGame(joinGameRequest);
-            updateGameList();
-
-            return "\n" + drawGameBoard(chessGame, teamColor) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
+            return "\n" + drawGameBoard(chessGame, color) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
         } catch (NoMatchException e) {
             throw new ResponseException(e.getMessage());
         }
@@ -247,19 +242,6 @@ public class ChessClient extends UiBase {
         GameData currentGameData = selectGame(currentChessGameNo);
         GameplayUi gameplayUi = new GameplayUi(serverUrl, currentGameData.game(), currentGameData.gameID(), currentChessPerspective, authToken);
         gameplayUi.open();
-    }
-
-    public String teamColorToString(ChessGame.TeamColor teamColor) {
-        return (teamColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
-    }
-
-    public ChessGame.TeamColor stringToTeamColor(String color) throws NoMatchException {
-        if (color.equals("white")) {
-            return ChessGame.TeamColor.WHITE;
-        } else if (color.equals("black")) {
-            return ChessGame.TeamColor.BLACK;
-        }
-        throw new NoMatchException("Error: the color given was not valid");
     }
 
 }
