@@ -5,10 +5,12 @@ import com.google.gson.Gson;
 import server.ResponseException;
 import websocket.WebSocketFacade;
 import websocket.WebSocketMessageHandler;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +36,13 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
         switch (serverMessageType) {
             case ServerMessage.ServerMessageType.NOTIFICATION -> handleNotificationMessage(message);
             case ServerMessage.ServerMessageType.LOAD_GAME ->  handleLoadGameMessage(message);
+            case ServerMessage.ServerMessageType.ERROR -> handleErrorMessage(message);
         }
+    }
+
+    public void handleErrorMessage(String message) {
+        ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+        System.out.println(errorMessage.getErrorMessage());
     }
 
     public void handleNotificationMessage(String message) {
@@ -47,6 +55,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
         LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
         chessGame = loadGameMessage.game();
         drawGameBoard(chessGame, perspective);
+        System.out.println("handle load game message reached");
     }
 
 
@@ -67,19 +76,24 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
         String[] tokens = input.split(" ");
         String cmd = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        switch (cmd) {
-            case "leave" -> leave();
-            case "redraw" -> redrawBoard();
-            case "makemove" -> makeMove(params);
-            case "highlightmoves" -> highlightMoves(params);
-            case "resign" -> resign();
-            default -> help();
-        };
+        try {
+            switch (cmd) {
+                case "leave" -> leave();
+                case "redraw" -> redrawBoard();
+                case "makemove" -> makeMove(params);
+                case "highlightmoves" -> highlightMoves(params);
+                case "resign" -> resign();
+                default -> help();
+            };
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void help() {
         System.out.println(
             """
+           
             leave - leaves the game
             redraw - redraws the gameboard
             makemove <cord1, cord2> makes a move in the game
@@ -106,8 +120,9 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             Collection<ChessPosition> validPositions = new ArrayList<>();
             validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
             System.out.println(drawGameBoard(chessGame, perspective, validPositions));
+        } else {
+            throw new ResponseException("Error: incorrect number of parameters for the given command");
         }
-        throw new ResponseException("Error: incorrect number of parameters for the given command");
     }
 
     private void redrawBoard() {

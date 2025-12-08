@@ -164,7 +164,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
         String gameIDString = String.valueOf(gameID);
-        System.out.println(message);
         broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
     }
 
