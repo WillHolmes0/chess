@@ -39,9 +39,9 @@ public class RetrievePlayerGameService {
     }
 
     private String getRole(String username, GameData gameData) {
-        if (gameData.whiteUsername().equals(username)) {
+        if (username.equals(gameData.whiteUsername())) {
             return "white";
-        } else if (gameData.blackUsername().equals(username)) {
+        } else if (username.equals(gameData.blackUsername())) {
             return "black";
         }
         return "observer";

@@ -41,18 +41,43 @@ public class RemovePlayerService {
                 gameDAO.setPlayer(null, playerColor, removePlayerRequest.gameID());
             }
 
-            String playerColorString = (playerColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
-            return new RemovePlayerResponse(playerColorString, username);
+            return new RemovePlayerResponse(getPlayerType(playerColor), username);
         }
         throw new UnauthorizedException("Error: unauthorized");
     }
 
     private ChessGame.TeamColor getUsernameColorFromGame(String username, GameData gameData) throws NoMatchException {
-        if (username.equals(gameData.whiteUsername())) {
+        if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
             return ChessGame.TeamColor.WHITE;
-        } else if (username.equals(gameData.blackUsername())) {
+        } else if (gameData.blackUsername() != null && username.equals(gameData.blackUsername())) {
             return ChessGame.TeamColor.BLACK;
         }
         return null;
     }
+
+    private String getPlayerType(ChessGame.TeamColor teamColor) {
+        if (teamColor == null) {
+            return "observer";
+        } else if (teamColor == ChessGame.TeamColor.WHITE) {
+            return "white player";
+        } else {
+            return "black player";
+        }
+    }
+
+//    private void removeIfWhite(String username, GameData gameData, GameDAO gameDAO, RemovePlayerRequest removePlayerRequest) throws NoMatchException, DataAccessException {
+//        if (gameData.whiteUsername() != null) {
+//            if (username.equals(gameData.whiteUsername())) {
+//                gameDAO.setPlayer(null, ChessGame.TeamColor.WHITE, removePlayerRequest.gameID());
+//            }
+//        }
+//    }
+//
+//    private void removeIfWhite(String username, GameData gameData, GameDAO gameDAO, RemovePlayerRequest removePlayerRequest) throws NoMatchException, DataAccessException {
+//        if (gameData.whiteUsername() != null) {
+//            if (username.equals(gameData.whiteUsername())) {
+//                gameDAO.setPlayer(null, ChessGame.TeamColor.WHITE, removePlayerRequest.gameID());
+//            }
+//        }
+//    }
 }

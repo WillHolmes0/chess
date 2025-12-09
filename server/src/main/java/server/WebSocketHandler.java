@@ -55,6 +55,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void broadcastAll(String gameID, ServerMessage serverMessage, Session exclusion) throws IOException {
         for (var session : gameClients.get(gameID)) {
+            System.out.println("session");
             if (session != exclusion) {
                 session.getRemote().sendString(new Gson().toJson(serverMessage));
             }
@@ -82,21 +83,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             broadcastAll(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(retrievePlayerGameResponse.chessGame());
-            System.out.println(retrievePlayerGameResponse.chessGame());
             broadcastSelf(String.valueOf(userGameCommand.getGameID()), loadGameMessage, ctx.session);
-        } catch (DataAccessException | UnauthorizedException | BadRequestException e) {
+        } catch (DataAccessException | UnauthorizedException | BadRequestException | NoMatchException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
     }
 
     public void removePlayerHandler(UserGameCommand userGameCommand, WsMessageContext ctx) throws IOException {
         try {
-            removeSessionFromGame(ctx, userGameCommand);
             RemovePlayerService removePlayerService = new RemovePlayerService(memoryDatabase);
             RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
-            ServerMessage serverMessage = new NotificationMessage(String.format("%s, player %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
-            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
+            ServerMessage serverMessage = new NotificationMessage(String.format("%s %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
+            removeSessionFromGame(ctx, userGameCommand);
         } catch (DataAccessException | UnauthorizedException | NoMatchException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
         }
@@ -151,7 +151,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         gameClients.get(String.valueOf(userGameCommand.getGameID())).remove(ctx.session);
     }
 
-    private String getPlayerRoleString(String role) {
+    private String getPlayerRoleString(String role) throws NoMatchException {
         if (role.equals("black")) {
             return "the black player";
         } else if (role.equals("white")) {
@@ -164,6 +164,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
         String gameIDString = String.valueOf(gameID);
+        if (message.toLowerCase().contains("error:")) {
+            message = message.split(":")[1].strip();
+        }
         broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
     }
 

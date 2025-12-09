@@ -49,9 +49,9 @@ public class UpdateGameService {
     }
 
     private ChessGame.TeamColor getPlayerColor(String username, GameData gameData) {
-        if (gameData.whiteUsername().equals(username)) {
+        if (username.equals(gameData.whiteUsername())) {
             return ChessGame.TeamColor.WHITE;
-        } else if (gameData.blackUsername().equals(username)) {
+        } else if (username.equals(gameData.blackUsername())) {
             return ChessGame.TeamColor.BLACK;
         }
         return null;

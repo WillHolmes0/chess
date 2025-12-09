@@ -35,13 +35,14 @@ public class EndGameService {
         if (!gameData.game().isActive()) {
             throw new BadRequestException("Error: you cannot resign the game as it is no longer being played");
         }
+        String username = authData.username();
         String color;
-        if (gameData.whiteUsername().equals(authData.username())) {
+        if (username.equals(gameData.whiteUsername())) {
             color = "white";
-        } else if (gameData.blackUsername().equals(authData.username())) {
+        } else if (username.equals(gameData.blackUsername())) {
             color = "black";
         } else {
-            throw new UnauthorizedException("Error: the user is not a player in the game");
+            throw new UnauthorizedException("Error: the user is not a player in the game and cannot resign");
         }
         gameData.game().endGame();
         gameDAO.updateGame(gameData);
