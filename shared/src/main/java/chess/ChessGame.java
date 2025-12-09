@@ -96,8 +96,11 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+    public Collection<ChessMove> validMoves(ChessPosition startPosition) throws IllegalArgumentException {
         ChessPiece piece = chessBoard.getPiece(startPosition);
+        if (piece == null) {
+            throw new IllegalArgumentException("Error: the provided chess position is empty");
+        }
         Collection<ChessMove> allMoves = piece.pieceMoves(chessBoard, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : allMoves) {
@@ -150,6 +153,8 @@ public class ChessGame {
                 promotePiece(move.getEndPosition(), move.getPromotionPiece());
             }
             teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+//            boolean whiteStalmateUpdate = isInStalemate(TeamColor.WHITE);
+//            boolean blackStalmateUpdate = isInStalemate(TeamColor.BLACK);
         } else {
             throw new InvalidMoveException("Error: move is invalid");
         }
@@ -192,10 +197,12 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (isInCheck(teamColor) && noValidMoves(teamColor)) {
+            active = false;
             return true;
         }
         return false;
     }
+
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
@@ -206,6 +213,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!isInCheck(teamColor) && noValidMoves(teamColor)) {
+            active = false;
             return true;
         }
         return false;

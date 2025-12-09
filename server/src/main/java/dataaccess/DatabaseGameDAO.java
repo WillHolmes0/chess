@@ -15,7 +15,9 @@ import java.util.Set;
 public class DatabaseGameDAO implements GameDAO {
 
     public DatabaseGameDAO() throws DataAccessException {
-        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {
+            throw new DataAccessException("Error:" + e.getMessage());
+        }
         createTableIfNonexistant();
     }
 

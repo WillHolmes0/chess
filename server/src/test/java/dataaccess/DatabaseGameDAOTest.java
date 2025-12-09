@@ -17,7 +17,7 @@ public class DatabaseGameDAOTest {
     public void setup() {
         try {
             databaseGameDAO = new DatabaseGameDAO();
-            databaseGameDAO.clearDatabase();
+//            databaseGameDAO.clearDatabase();
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
         }

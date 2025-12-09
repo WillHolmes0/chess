@@ -27,8 +27,8 @@ public class ChessClient extends UiBase {
         System.out.println("Welcome to the ChessServer");
 
         //chessboard display for testing
-        System.out.println(login("r", "t"));
-        System.out.println(listGames());
+//        System.out.println(login("r", "t"));
+//        System.out.println(listGames());
 //        System.out.println(leaveGame("1"));
 //        System.out.println(joinGame("white", "2"));
 //        System.out.println(leaveGame("2"));
@@ -45,7 +45,15 @@ public class ChessClient extends UiBase {
 
             System.out.println(eval(input));
             if (enterGameUi) {
-                enterGame();
+                try {
+                    enterGame();
+                } catch (ResponseException e) {
+                    String message = e.getMessage();
+                    if (message.toLowerCase().contains("error:")) {
+                        message = message.split(":")[1].strip();
+                    }
+                    System.out.println(message);
+                }
                 enterGameUi = false;
             }
         }
@@ -180,7 +188,7 @@ public class ChessClient extends UiBase {
         return gameListString;
     }
 
-    public String observeGameCallable(String... params) {
+    public String observeGameCallable(String... params) throws ResponseException {
         if (params.length == 1) {
             String gameKey = params[0];
             currentChessPerspective = "observer";
@@ -192,9 +200,9 @@ public class ChessClient extends UiBase {
 
     private String observeGame(String gameKey, String color) throws ResponseException {
         try {
-            enterGameUi = true;
             GameData gameData = selectGame(gameKey);
             ChessGame chessGame = gameData.game();
+            enterGameUi = true;
 
             return "\n" + drawGameBoard(chessGame, color) + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR;
         } catch (NoMatchException e) {
@@ -220,7 +228,7 @@ public class ChessClient extends UiBase {
                 - help (displays possible actions for the user)""";
     }
 
-    private GameData selectGame(String gameNumber) {
+    private GameData selectGame(String gameNumber) throws ResponseException {
         GameData gameData = gameList.get(gameNumber);
         if (gameData == null) {
             throw new ResponseException("Could not find game. Either the game number is invalid, or you need to run listgames to load the games.");
@@ -238,7 +246,7 @@ public class ChessClient extends UiBase {
         }
     }
 
-    private void enterGame() {
+    private void enterGame() throws ResponseException {
         GameData currentGameData = selectGame(currentChessGameNo);
         GameplayUi gameplayUi = new GameplayUi(serverUrl, currentGameData.game(), currentGameData.gameID(), currentChessPerspective, authToken);
         gameplayUi.open();

@@ -23,11 +23,11 @@ public class DatabaseUserDAOTest {
         } catch (DataAccessException e) {
             System.out.println("could not create DAO");
         }
-        try {
-            databaseUserDAO.clearDatabase();
-        } catch (DataAccessException e) {
-            System.out.println("could not clear the 'users' table");
-        }
+//        try {
+//            databaseUserDAO.clearDatabase();
+//        } catch (DataAccessException e) {
+//            System.out.println("could not clear the 'users' table");
+//        }
     }
 
 

@@ -6,11 +6,10 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        new ChessClient(serverUrl).run();
-//        try {
-//            new ChessClient(serverUrl).run();
-//        } catch (Throwable e) {
-//            System.out.printf("Could not start server: %s%n", e.getMessage());
-//        }
+        try {
+            new ChessClient(serverUrl).run();
+        } catch (Throwable e) {
+            System.out.printf("Could not start server: %s%n", e.getMessage());
+        }
     }
 }

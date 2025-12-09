@@ -65,19 +65,4 @@ public class RemovePlayerService {
         }
     }
 
-//    private void removeIfWhite(String username, GameData gameData, GameDAO gameDAO, RemovePlayerRequest removePlayerRequest) throws NoMatchException, DataAccessException {
-//        if (gameData.whiteUsername() != null) {
-//            if (username.equals(gameData.whiteUsername())) {
-//                gameDAO.setPlayer(null, ChessGame.TeamColor.WHITE, removePlayerRequest.gameID());
-//            }
-//        }
-//    }
-//
-//    private void removeIfWhite(String username, GameData gameData, GameDAO gameDAO, RemovePlayerRequest removePlayerRequest) throws NoMatchException, DataAccessException {
-//        if (gameData.whiteUsername() != null) {
-//            if (username.equals(gameData.whiteUsername())) {
-//                gameDAO.setPlayer(null, ChessGame.TeamColor.WHITE, removePlayerRequest.gameID());
-//            }
-//        }
-//    }
 }

@@ -1,8 +1,10 @@
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import server.ResponseException;
+import websocket.NoMatchException;
 import websocket.WebSocketFacade;
 import websocket.WebSocketMessageHandler;
 import websocket.messages.ErrorMessage;
@@ -85,6 +87,10 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
                 default -> help();
             };
         } catch (ResponseException e) {
+            String message = e.getMessage();
+            if (message.toLowerCase().contains("error:")) {
+                message = message.split(":")[1].strip();
+            }
             System.out.println(e.getMessage());
         }
     }
@@ -96,7 +102,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             leave - leaves the game
             redraw - redraws the gameboard
             makemove <cord1, cord2> makes a move in the game
-            showmoves <cord1> - highlights valid moves for a given piece
+            highlightmoves <cord1> - highlights valid moves for a given piece
             resign - admits defeats and ends the game
             help - displays user options
             """
@@ -108,19 +114,30 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
     }
 
     private void resign() {
-        webSocketFacade.resign(chessGameID, authentication);
+        System.out.println("\nAre you sure you want to resign? (type yes to proceed)\n >>>");
+        Scanner scanner = new Scanner(System.in);
+        String response = scanner.nextLine().toLowerCase().strip();
+        if (response.equals("yes")) {
+            webSocketFacade.resign(chessGameID, authentication);
+        } else {
+            System.out.println("\nresignation canceled");
+        }
     }
 
-    private void highlightMoves(String... params) {
+    private void highlightMoves(String... params) throws ResponseException {
         if (params.length == 1) {
-            String[] coordinates = params[0].split("");
-            ChessPosition chessPosition = new ChessPosition(Integer.valueOf(coordinates[1]), evaluateCoordinate(coordinates[0]));
-            Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
-            Collection<ChessPosition> validPositions = new ArrayList<>();
-            validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
-            System.out.println(drawGameBoard(chessGame, perspective, validPositions));
+            try {
+                String[] coordinates = params[0].split("");
+                ChessPosition chessPosition = new ChessPosition(evaluateNumericCoordinate(coordinates[1]), evaluateLetterCoordinate(coordinates[0]));
+                Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
+                Collection<ChessPosition> validPositions = new ArrayList<>();
+                validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
+                System.out.println(drawGameBoard(chessGame, perspective, validPositions));
+            } catch (IllegalArgumentException e) {
+                throw new ResponseException(e.getMessage());
+            }
         } else {
-            throw new ResponseException("Incorrect number of parameters for the given command");
+            throw new ResponseException("Error: Incorrect number of parameters for the given command");
         }
     }
 
@@ -128,23 +145,44 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
         System.out.println(drawGameBoard(chessGame, perspective));
     }
 
-    private void makeMove(String... params) {
-        if (params.length == 2) {
-            String[] initialCords = params[0].split("");
-            String[] finalCords = params[1].split("");
-            int y1 = evaluateCoordinate(initialCords[0]);
-            int x1 = evaluateCoordinate(initialCords[1]);
-            int y2 = evaluateCoordinate(finalCords[0]);
-            int x2 = evaluateCoordinate(finalCords[1]);
-            ChessMove chessMove = new ChessMove(new ChessPosition(x1, y1), new ChessPosition(x2, y2), null);
-
-            webSocketFacade.makeMove(chessMove, chessGameID, authentication);
+    private void makeMove(String... params) throws ResponseException {
+        ChessPiece.PieceType promotionPiece = null;
+        if (params.length == 2 || params.length == 3) {
+            try {
+                String[] initialCords = params[0].split("");
+                String[] finalCords = params[1].split("");
+                int y1 = evaluateLetterCoordinate(initialCords[0]);
+                int x1 = evaluateNumericCoordinate(initialCords[1]);
+                int y2 = evaluateLetterCoordinate(finalCords[0]);
+                int x2 = evaluateNumericCoordinate(finalCords[1]);
+                if (params.length == 3) {
+                    promotionPiece = stringToChessPiece(params[2].toLowerCase().strip());
+                }
+                ChessMove chessMove = new ChessMove(new ChessPosition(x1, y1), new ChessPosition(x2, y2), promotionPiece);
+                webSocketFacade.makeMove(chessMove, chessGameID, authentication);
+            } catch (NoMatchException e) {
+                throw new ResponseException(e.getMessage());
+            }
         } else {
-            throw new ResponseException("Incorrect number of parameters for the given command");
+            throw new ResponseException("Error: Incorrect number of parameters for the given command");
         }
     }
 
-    private int evaluateCoordinate(String input) {
+    private int evaluateNumericCoordinate(String input) {
+        return switch (input) {
+            case "1" -> 1;
+            case "2" -> 2;
+            case "3" -> 3;
+            case "4" -> 4;
+            case "5" -> 5;
+            case "6" -> 6;
+            case "7" -> 7;
+            case "8" -> 8;
+            default -> throw new ResponseException("Error: Incorrect coordinate inputted");
+        };
+    }
+
+    private int evaluateLetterCoordinate(String input) {
         return switch (input) {
             case "a" -> 1;
             case "b" -> 2;
@@ -154,15 +192,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             case "f" -> 6;
             case "g" -> 7;
             case "h" -> 8;
-            case "1" -> 1;
-            case "2" -> 2;
-            case "3" -> 3;
-            case "4" -> 4;
-            case "5" -> 5;
-            case "6" -> 6;
-            case "7" -> 7;
-            case "8" -> 8;
-            default -> throw new ResponseException("Incorrect coordinate inputted");
+            default -> throw new ResponseException("Error: Incorrect coordinate inputted");
         };
     }
 }

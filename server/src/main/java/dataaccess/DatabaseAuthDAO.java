@@ -12,7 +12,9 @@ import java.util.UUID;
 public class DatabaseAuthDAO implements AuthDAO {
 
     public DatabaseAuthDAO() throws DataAccessException{
-        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {
+            throw new DataAccessException("Error:" + e.getMessage());
+        }
         createTableIfNotExists();
     }
 

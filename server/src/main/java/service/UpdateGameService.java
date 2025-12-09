@@ -32,18 +32,19 @@ public class UpdateGameService {
         }
         GameData gameData = gameDAO.getGame(updateGameRequest.gameID());
         try {
-//            gameData.game().validMoves(updateGameRequest.chessMove().getStartPosition());
             validateTurn(authData.username(), gameData);
             gameData.game().makeMove(updateGameRequest.chessMove());
+            checkToEndGame(gameData.game());
             gameDAO.updateGame(gameData);
             return new UpdateGameResponse(
+                    getPlayerColor(authData.username(), gameData),
                     authData.username(),
                     chessPieceToString(gameData.game().getBoard().getPiece(updateGameRequest.chessMove().getEndPosition())),
                     convertCord(updateGameRequest.chessMove().getStartPosition()),
                     convertCord(updateGameRequest.chessMove().getEndPosition()),
                     gameData);
         } catch (InvalidMoveException e) {
-            throw new BadRequestException("Error: invalid move supplied");
+            throw new BadRequestException(e.getMessage());
         }
 
     }
@@ -55,6 +56,13 @@ public class UpdateGameService {
             return ChessGame.TeamColor.BLACK;
         }
         return null;
+    }
+
+    private void checkToEndGame(ChessGame chessGame) {
+        chessGame.isInStalemate(ChessGame.TeamColor.WHITE);
+        chessGame.isInStalemate(ChessGame.TeamColor.BLACK);
+        chessGame.isInCheckmate(ChessGame.TeamColor.WHITE);
+        chessGame.isInCheckmate(ChessGame.TeamColor.BLACK);
     }
 
     private void validateTurn(String username, GameData gameData) throws UnauthorizedException {

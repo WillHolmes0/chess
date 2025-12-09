@@ -12,7 +12,9 @@ import java.sql.SQLException;
 public class DatabaseUserDAO implements UserDAO{
 
     public DatabaseUserDAO() throws DataAccessException {
-        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {}
+        try { DatabaseManager.createDatabase(); } catch (DataAccessException e) {
+            throw new DataAccessException("Error:" + e.getMessage());
+        }
         createTableIfNonexistant();
     }
 

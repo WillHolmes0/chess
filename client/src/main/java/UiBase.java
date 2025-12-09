@@ -141,4 +141,17 @@ public class UiBase {
         }
         throw new NoMatchException("Error: the color given was not valid");
     }
+
+    public ChessPiece.PieceType stringToChessPiece(String piece) throws NoMatchException {
+        return switch (piece) {
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "king" -> ChessPiece.PieceType.KING;
+            case "pawn" -> ChessPiece.PieceType.PAWN;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new NoMatchException("Error: The entered chess piece type is invalid");
+        };
+    }
+
 }

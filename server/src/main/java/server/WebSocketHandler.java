@@ -113,7 +113,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
 
             NotificationMessage notificationMessage = new NotificationMessage(
-                String.format("%s player moved %s from %s to %s",
+                String.format("%s player %s moved %s from %s to %s",
+                updateGameResponse.color(),
                 updateGameResponse.username(),
                 updateGameResponse.chessPiece(),
                 updateGameResponse.startPosition(),
@@ -122,6 +123,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             broadcastAll(String.valueOf(userGameCommand.getGameID()), notificationMessage, ctx.session);
 
             handleCheck(updateGameResponse.gameData(), ctx);
+
+            handleStalmate(updateGameResponse.gameData(), ctx);
 
         } catch (DataAccessException | BadRequestException | UnauthorizedException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
@@ -164,10 +167,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void errorHandler(int gameID, String message, WsMessageContext ctx) throws IOException {
         String gameIDString = String.valueOf(gameID);
-        if (message.toLowerCase().contains("error:")) {
-            message = message.split(":")[1].strip();
-        }
         broadcastSelf(gameIDString, new ErrorMessage(message), ctx.session);
+    }
+
+    private void handleStalmate(GameData gameData, WsMessageContext ctx) throws IOException {
+        if (gameData.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("white player %s is in stalmate", gameData.whiteUsername()));
+            broadcastAll(String.valueOf(gameData.gameID()), notificationMessage, null);
+        } else if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("black player %s is in stalmate", gameData.blackUsername()));
+            broadcastAll(String.valueOf(gameData.gameID()), notificationMessage, null);
+        }
     }
 
     private void handleCheck(GameData gameData, WsMessageContext ctx) throws IOException {

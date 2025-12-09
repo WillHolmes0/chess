@@ -14,7 +14,7 @@ public class DatabaseAuthDAOTests {
     public void setup() {
         try {
             databaseAuthDAO = new DatabaseAuthDAO();
-            databaseAuthDAO.clearDatabase();
+//            databaseAuthDAO.clearDatabase();
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
         }
