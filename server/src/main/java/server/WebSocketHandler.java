@@ -95,7 +95,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             RemovePlayerRequest removePlayerRequest = new RemovePlayerRequest(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             RemovePlayerResponse removePlayerResponse = removePlayerService.removePlayer(removePlayerRequest);
             ServerMessage serverMessage = new NotificationMessage(String.format("%s %s left the game", removePlayerResponse.color(), removePlayerResponse.username()));
-            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, null);
+            broadcastAll(String.valueOf(userGameCommand.getGameID()), serverMessage, ctx.session);
             removeSessionFromGame(ctx, userGameCommand);
         } catch (DataAccessException | UnauthorizedException | NoMatchException | BadRequestException e) {
             errorHandler(userGameCommand.getGameID(), e.getMessage(), ctx);
