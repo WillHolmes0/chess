@@ -102,7 +102,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
             leave - leaves the game
             redraw - redraws the gameboard
             makemove <cord1, cord2> makes a move in the game
-            highlightmoves <cord1> - highlights valid moves for a given piece
+            highlightmoves <cord1> - highlights valid moves for a given position
             resign - admits defeats and ends the game
             help - displays user options
             """
@@ -132,7 +132,7 @@ public class GameplayUi extends UiBase implements WebSocketMessageHandler {
                 Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
                 Collection<ChessPosition> validPositions = new ArrayList<>();
                 validMoves.forEach((move) -> validPositions.add(move.getEndPosition()));
-                System.out.println(drawGameBoard(chessGame, perspective, validPositions));
+                System.out.println(drawGameBoard(chessGame, perspective, validPositions, chessPosition));
             } catch (IllegalArgumentException e) {
                 throw new ResponseException(e.getMessage());
             }
